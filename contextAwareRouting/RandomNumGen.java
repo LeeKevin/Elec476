@@ -3,12 +3,11 @@ package contextAwareRouting;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class RandomNumGen {
-	
+public class RandomNumGen extends Random{
+	/*
 	private static double leftLimit;
 	private static double rightLimit;
 	private RNGtype type;
-	private static Random generator = new Random();
 	
 	public RandomNumGen(double leftLimit, double rightLimit) {
 		this.leftLimit = leftLimit;
@@ -19,26 +18,27 @@ public class RandomNumGen {
 	public RandomNumGen() {
 		this.type = RNGtype.POISSON;
 	}
-
-	public static ArrayList<Double> uniformList (int size) {
+	*/
+	
+	public ArrayList<Double> uniformList (int size, int low, int high) {
 		int i;
 		ArrayList<Double> list = new ArrayList<Double>();
 		list.clear();
 		for (i=0; i<size; i++) {
-			list.add(genUniformNum());
+			list.add(nextDouble(low, high));
 		}
 		
 		return list;
 	}
 	
-	public static ArrayList<Integer> poissonArrivalTimesList(double arrivalRate, double maxTime) {
+	public ArrayList<Integer> poissonList(int arrivalRate, int maxTime) {
 		ArrayList<Integer> list = new ArrayList<Integer>();
 		list.clear();
 		list.add(0,(Integer) 0);
 		double last = 0;
 		
 		for (int i=1; last < maxTime; i++) {
-			last = (last - (1 / arrivalRate) * Math.log(generator.nextDouble()));
+			last = (last - (1 / arrivalRate) * Math.log(nextDouble()));
 			list.add(i, (Integer) (int) last);
 		}
 		list.remove(list.size()-1);
@@ -46,9 +46,9 @@ public class RandomNumGen {
 		return list;
 	}
 	
-	public static double genUniformNum() {
-		double r = generator.nextDouble();		
-		return r*(rightLimit-leftLimit) + leftLimit;
+	public double nextDouble(int low, int high) {
+		double r = nextDouble();		
+		return r*(high-low) + low;
 	}
 	
 }

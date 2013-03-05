@@ -2,28 +2,47 @@ package contextAwareRouting;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Random;
 
 public class Mainline {
 	
-		private static int T = 0;
-		private static final int Xmax = 0;
-		private static final int Ymax = 0;
-		private static final int numUsers = 0;
-		private static final int numRelays = 0;
-		private static final int numapps = 0;
-		private static final int requestrate = 0;
-		private static final int maxtime = 0;
-		private static final int commradius = 0;
-		private static final String [][] AppPref = new String[0][0];
+		public static final int T = 0;
+		public static final int Xmax = 0;
+		public static final int Ymax = 0;
+		public static final int numUsers = 0;
+		public static final int numRelays = 0;
+		public static final int numapps = 0;
+		public static final int requestrate = 0;
+		public static final int queuerate = 0;
+		public static final int maxtime = 0;
+		public static final String [][] AppPref = new String[0][0];
 	
-	private static void main(String[] args) {
-		 
+		//The source of all things random:
+		public static final RandomNumGen Rand = new RandomNumGen();
+		
+	public static void main(String[] args) {
+		
+		 //Create nodes at random and central server 
 		 UserNode[] Users = createUserNodes(numUsers);
 		 RelayNode[] Relays = createRelayNodes(numRelays);
-		 CentralServer Server = new CentralServer(Users, Relays, AppPref, commradius);
-		 ArrayList<Integer> Arrival = RandomNumGen.poissonArrivalTimesList(requestrate, maxtime);
+		 CentralServer Server = new CentralServer(Users, Relays);
 		 
+		 //Create random arrival times
+		 ArrayList<Integer> Arrival = Rand.poissonList(requestrate, maxtime);
+		 
+		 //time setup
+		 boolean done = false;
+		 int tick = 0;
+		 
+		 //main simulation time loop
+		 while (!done){
+			 
+			 //create request if its time
+			 while (Arrival.remove((Integer) tick)){
+				 Server.createRequest();
+			 }
+				 
+			 tick++;	 
+		 }
 	 }
 	 
 	 private static UserNode[] createUserNodes(int num){
@@ -31,8 +50,6 @@ public class Mainline {
 		 //Make master user node list
 		 UserNode[] Users = new UserNode[num];
 		 
-		 //Variables to work with
-		 Random Rand = new Random();
 		 int x, y;		 
 		 
 		 //for each node
@@ -40,8 +57,8 @@ public class Mainline {
 			 
 			 //generate random x,y
 			 do {
-				 x = (int) (Rand.nextDouble() * 2 * Xmax - Xmax);
-				 y = (int) (Rand.nextDouble() * 2 * Ymax - Ymax);
+				 x = (int) Rand.nextDouble(-Xmax, Xmax);
+				 y = (int) Rand.nextDouble(-Ymax, Ymax);
 			 } while (Math.pow(x/Xmax, 2) + Math.pow(y/Ymax, 2) > 1);
 			 
 			 //generates new array for each node
@@ -69,7 +86,6 @@ public class Mainline {
 		 RelayNode[] Nodes = new RelayNode[num]; 
 		 
 		 //Variables to work with
-		 Random Rand = new Random();
 		 int x, y;		 
 		 
 		 //for each node
@@ -77,15 +93,12 @@ public class Mainline {
 			 
 			 //generate random x,y
 			 do {
-				 x = (int) (Rand.nextDouble() * 2 * Xmax - Xmax);
-				 y = (int) (Rand.nextDouble() * 2 * Ymax - Ymax);
+				 x = (int) Rand.nextDouble(-Xmax, Xmax);
+				 y = (int) Rand.nextDouble(-Ymax, Ymax);
 			 } while (Math.pow(x/Xmax, 2) + Math.pow(y/Ymax, 2) > 1);
 			 
-			 //generates an empty list for the queue
-			 LinkedList <Request> Queue = new LinkedList <Request>();
-			 
 			 //create new relay node and add to the master list
-			 Nodes[i] = new RelayNode(Queue, 0, x, y);
+			 Nodes[i] = new RelayNode(x, y);
 			 
 		 }
 		 
