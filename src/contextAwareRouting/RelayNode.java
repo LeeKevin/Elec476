@@ -13,8 +13,8 @@ public class RelayNode {
 		
 		setQueue(inputQueue);
 		setProcessing(inputProcessing);
-		setInputXpos(inputXpos);
-		setInputYpos(inputYpos);
+		setXpos(inputXpos);
+		setYpos(inputYpos);
 		
 	}
 	
@@ -26,13 +26,13 @@ public class RelayNode {
 		this.processing = processing;
 	}
 	
-	void setInputXpos(int xpos){
+	public void setXpos(int xpos) {
 		this.xpos = xpos;
 	}
 	
-	void setInputYpos(int ypos){
+	public void setYpos(int ypos) {
 		this.ypos = ypos;
-	}
+	}	
 	
 	LinkedList<Request> getQueue(){
 		return queue;
@@ -41,5 +41,12 @@ public class RelayNode {
 	int getProcessing(){
 		return processing;
 	}
+	
+	public int getXpos() {
+		return xpos;
+	}
 
+	public int getYpos() {
+		return ypos;
+	}
 }

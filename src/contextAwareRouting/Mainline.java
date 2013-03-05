@@ -1,38 +1,48 @@
 package contextAwareRouting;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 
 public class Mainline {
 	
 		private static int T = 0;
-		private static int Xmax = 0;
-		private static int Ymax = 0;
-		private static int numUsers = 0;
-		private static int numRelays = 0;
-		private static int numapps = 0;
-		private static String [][] AppPref;
+		private static final int Xmax = 0;
+		private static final int Ymax = 0;
+		private static final int numUsers = 0;
+		private static final int numRelays = 0;
+		private static final int numapps = 0;
+		private static final int requestrate = 0;
+		private static final int maxtime = 0;
+		private static final int commradius = 0;
+		private static final String [][] AppPref = new String[0][0];
 	
-	 public void main(String[] args) {
+	private static void main(String[] args) {
 		 
-		 UserNode[] users = createUserNodes(numUsers);
-		 RelayNode[] relays = createRelayNodes(numRelays);
-		 CentralServer server = new CentralServer(users, relays, AppPref);
+		 UserNode[] Users = createUserNodes(numUsers);
+		 RelayNode[] Relays = createRelayNodes(numRelays);
+		 CentralServer Server = new CentralServer(Users, Relays, AppPref, commradius);
+		 ArrayList<Integer> Arrival = RandomNumGen.poissonArrivalTimesList(requestrate, maxtime);
 		 
 	 }
 	 
-	 private UserNode[] createUserNodes(int num){
+	 private static UserNode[] createUserNodes(int num){
 		 
-		 UserNode[] User = new UserNode[num]; 
+		 //Make master user node list
+		 UserNode[] Users = new UserNode[num];
+		 
+		 //Variables to work with
 		 Random Rand = new Random();
 		 int x, y;		 
 		 
+		 //for each node
 		 for(int i = 0; i<num; i++){
+			 
 			 //generate random x,y
 			 do {
 				 x = (int) (Rand.nextDouble() * 2 * Xmax - Xmax);
 				 y = (int) (Rand.nextDouble() * 2 * Ymax - Ymax);
-			 } while (Math.pow(x/Xmax, 2) + Math.pow(y/Ymax, 2) < 1);
+			 } while (Math.pow(x/Xmax, 2) + Math.pow(y/Ymax, 2) > 1);
 			 
 			 //generates new array for each node
 			 boolean[] Apps = new boolean[numapps];
@@ -45,53 +55,40 @@ public class Mainline {
 			 //generates an empty list for the queue
 			 LinkedList <Request> Queue = new LinkedList <Request>();
 			 
-			 //create new usernode and add to the master list
-			 User[i] = new UserNode(Apps, x, y, Queue);
+			 //create new user node and add to the master list
+			 Users[i] = new UserNode(Apps, x, y, Queue);
 			 
 		 }
 		 
-		 return User;
+		 return Users;
 	 }	 
 	 
-	 private RelayNode[] createRelayNodes( int num ){
+	 private static RelayNode[] createRelayNodes( int num ){
 		 
-		 RelayNode[] Node = new RelayNode[num]; 
+		 //Make master relay node list
+		 RelayNode[] Nodes = new RelayNode[num]; 
 		 
+		 //Variables to work with
 		 Random Rand = new Random();
 		 int x, y;		 
 		 
+		 //for each node
 		 for(int i = 0; i<num; i++){
+			 
 			 //generate random x,y
 			 do {
 				 x = (int) (Rand.nextDouble() * 2 * Xmax - Xmax);
 				 y = (int) (Rand.nextDouble() * 2 * Ymax - Ymax);
-			 } while (Math.pow(x/Xmax, 2) + Math.pow(y/Ymax, 2) < 1);
+			 } while (Math.pow(x/Xmax, 2) + Math.pow(y/Ymax, 2) > 1);
 			 
 			 //generates an empty list for the queue
 			 LinkedList <Request> Queue = new LinkedList <Request>();
 			 
-			 //create new usernode and add to the master list
-			 Node[i] = new RelayNode(Queue, 0, x, y);
+			 //create new relay node and add to the master list
+			 Nodes[i] = new RelayNode(Queue, 0, x, y);
 			 
 		 }
 		 
-		 return Node;
-	 }
-	 
-	 private static Network createNetwork(UserNode[] users, RelayNode[] relays, int num){
-		 
-		 
-		 //each row and column contains the information for the connections.
-		 //This matrix should be symmetric. 
-		 
-		 
-		 
-		 boolean AMatrix[][] = new boolean[num][num];
-		 
-		 Network ntwk = new Network(AMatrix);
-		 return ntwk;
-		 
-	 }
-	 
-	 
+		 return Nodes;
+	 } 
 }
