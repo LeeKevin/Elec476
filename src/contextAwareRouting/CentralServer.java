@@ -5,14 +5,15 @@ public class CentralServer {
 	private UserNode[] userList;
 	private RelayNode[] relayList;
 	private String[][] appPreference;
+	private boolean[][] adjMat; //Adjacency Matrix
 	//private RelayNodes[] shortestPath;
 	
-	public CentralServer( UserNode[] totUsers, RelayNode[] totRelays, String[][] totAppPreference){
+	public CentralServer( UserNode[] Users, RelayNode[] Relays, String[][] AppPreference){
 		
 		//Setup attributes
-		setUserNode(totUsers);
-		setRelayNode(totRelays);
-		setAppPreference(totAppPreference);
+		setUserNode(Users);
+		setRelayNode(Relays);
+		setAppPreference(AppPreference);
 		
 	}
 
@@ -28,6 +29,10 @@ public class CentralServer {
 		this.appPreference = appPreference;
 	}
 	
+	void setAdjMat(boolean[][] adjMat){
+		this.adjMat = adjMat;
+	}
+	
 	public UserNode[] getUserList(){
 		return userList;
 	}
@@ -38,5 +43,9 @@ public class CentralServer {
 	
 	public String[][] appPreference(){
 		return appPreference;	
+	}
+	
+	boolean[][] getAdjMat(){
+		return adjMat;
 	}
 }

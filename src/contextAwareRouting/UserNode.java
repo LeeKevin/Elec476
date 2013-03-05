@@ -6,11 +6,11 @@ import java.util.LinkedList;
 public class UserNode {
 	
 	private boolean appList[];
-	private  LinkedList <Integer>queue;
+	private  LinkedList <Request>queue;
 	private int xpos;
 	private int ypos;
 	
-	public UserNode( boolean inputAppList[], int inputXpos, int inputYpos, LinkedList <Integer>inputQueue){
+	public UserNode( boolean inputAppList[], int inputXpos, int inputYpos, LinkedList <Request>inputQueue){
 		
 		setAppList(inputAppList);
 		setXpos(inputXpos);
@@ -31,7 +31,7 @@ public class UserNode {
 		this.ypos = ypos;
 	}
 	
-	public void setQueue(LinkedList <Integer>queue){
+	public void setQueue(LinkedList <Request>queue){
 		this.queue = queue;
 		
 	}
@@ -48,7 +48,7 @@ public class UserNode {
 		return ypos;
 	}
 	
-	public LinkedList<Integer> getQueue(){
+	public LinkedList<Request> getQueue(){
 		return queue;
 	}
  	

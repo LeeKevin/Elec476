@@ -11,12 +11,13 @@ public class Mainline {
 		private static int numUsers = 0;
 		private static int numRelays = 0;
 		private static int numapps = 0;
+		private static String [][] AppPref;
 	
 	 public void main(String[] args) {
 		 
 		 UserNode[] users = createUserNodes(numUsers);
 		 RelayNode[] relays = createRelayNodes(numRelays);
-		 Network ntwk = createNetwork(users, relays, numUsers + numRelays);
+		 CentralServer server = new CentralServer(users, relays, AppPref);
 		 
 	 }
 	 
@@ -28,8 +29,10 @@ public class Mainline {
 		 
 		 for(int i = 0; i<num; i++){
 			 //generate random x,y
-			 x = (int) (Rand.nextDouble() * 2 * Xmax - Xmax);
-			 y = (int) (Rand.nextDouble() * 2 * Ymax - Ymax);
+			 do {
+				 x = (int) (Rand.nextDouble() * 2 * Xmax - Xmax);
+				 y = (int) (Rand.nextDouble() * 2 * Ymax - Ymax);
+			 } while (Math.pow(x/Xmax, 2) + Math.pow(y/Ymax, 2) < 1);
 			 
 			 //generates new array for each node
 			 boolean[] Apps = new boolean[numapps];
@@ -40,10 +43,10 @@ public class Mainline {
 			 }
 			 
 			 //generates an empty list for the queue
-			 LinkedList <Integer> queue = new LinkedList <Integer>();
+			 LinkedList <Request> Queue = new LinkedList <Request>();
 			 
 			 //create new usernode and add to the master list
-			 User[i] = new UserNode(Apps, x, y, queue);
+			 User[i] = new UserNode(Apps, x, y, Queue);
 			 
 		 }
 		 
@@ -52,17 +55,27 @@ public class Mainline {
 	 
 	 private RelayNode[] createRelayNodes( int num ){
 		 
-		 RelayNode[] user = new RelayNode[num]; 
+		 RelayNode[] Node = new RelayNode[num]; 
+		 
+		 Random Rand = new Random();
+		 int x, y;		 
 		 
 		 for(int i = 0; i<num; i++){
-			 //BASED ON NETWORK MODEL
-			 //create random x 
-			 //create random y
-			 //create random appList
-			 //Initialize queue
+			 //generate random x,y
+			 do {
+				 x = (int) (Rand.nextDouble() * 2 * Xmax - Xmax);
+				 y = (int) (Rand.nextDouble() * 2 * Ymax - Ymax);
+			 } while (Math.pow(x/Xmax, 2) + Math.pow(y/Ymax, 2) < 1);
+			 
+			 //generates an empty list for the queue
+			 LinkedList <Request> Queue = new LinkedList <Request>();
+			 
+			 //create new usernode and add to the master list
+			 Node[i] = new RelayNode(Queue, 0, x, y);
+			 
 		 }
 		 
-		 return user;
+		 return Node;
 	 }
 	 
 	 private static Network createNetwork(UserNode[] users, RelayNode[] relays, int num){

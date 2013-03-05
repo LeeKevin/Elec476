@@ -4,12 +4,12 @@ import java.util.LinkedList;
 
 public class RelayNode {
 	
-	private  LinkedList <Integer>queue;
+	private  LinkedList <Request>queue;
 	private int processing;
 	private int xpos;
 	private int ypos;
 	
-	public RelayNode(LinkedList<Integer> inputQueue, int inputProcessing, int inputXpos, int inputYpos){
+	public RelayNode(LinkedList<Request> inputQueue, int inputProcessing, int inputXpos, int inputYpos){
 		
 		setQueue(inputQueue);
 		setProcessing(inputProcessing);
@@ -18,7 +18,7 @@ public class RelayNode {
 		
 	}
 	
-	void setQueue(LinkedList<Integer> queue){
+	void setQueue(LinkedList<Request> queue){
 		this.queue = queue; 
 	}
 	
@@ -34,7 +34,7 @@ public class RelayNode {
 		this.ypos = ypos;
 	}
 	
-	LinkedList<Integer> getQueue(){
+	LinkedList<Request> getQueue(){
 		return queue;
 	}
 	

@@ -32,6 +32,7 @@ public class RandomNumGen {
 	}
 	
 	public ArrayList<Double> poissonArrivalTimesList(double arrivalRate, double maxTime) {
+		Random generator = new Random();
 		
 		int i=0;
 		ArrayList<Double> list = new ArrayList<Double>();

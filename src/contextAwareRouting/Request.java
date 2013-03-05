@@ -2,6 +2,6 @@ package contextAwareRouting;
 
 public class Request {
 
-	//private KEvin is awesome test! test2
+	//private KEvin is awesome
 	
 }
