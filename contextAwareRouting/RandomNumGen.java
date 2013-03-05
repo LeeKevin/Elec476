@@ -5,10 +5,10 @@ import java.util.Random;
 
 public class RandomNumGen {
 	
-	private double leftLimit;
-	private double rightLimit;
+	private static double leftLimit;
+	private static double rightLimit;
 	private RNGtype type;
-	Random generator = new Random();
+	private static Random generator = new Random();
 	
 	public RandomNumGen(double leftLimit, double rightLimit) {
 		this.leftLimit = leftLimit;
@@ -20,7 +20,7 @@ public class RandomNumGen {
 		this.type = RNGtype.POISSON;
 	}
 
-	public ArrayList<Double> uniformList (int size) {
+	public static ArrayList<Double> uniformList (int size) {
 		int i;
 		ArrayList<Double> list = new ArrayList<Double>();
 		list.clear();
@@ -31,24 +31,22 @@ public class RandomNumGen {
 		return list;
 	}
 	
-	public ArrayList<Double> poissonArrivalTimesList(double arrivalRate, double maxTime) {
-		Random generator = new Random();
-		
-		int i=0;
-		ArrayList<Double> list = new ArrayList<Double>();
+	public static ArrayList<Integer> poissonArrivalTimesList(double arrivalRate, double maxTime) {
+		ArrayList<Integer> list = new ArrayList<Integer>();
 		list.clear();
-		list.add(0,(double) 0);
+		list.add(0,(Integer) 0);
+		double last = 0;
 		
-		while (list.get(i) < maxTime) {
-			i++;
-			list.add(i, list.get(i-1) - (1 / arrivalRate) * Math.log(generator.nextDouble()));
+		for (int i=1; last < maxTime; i++) {
+			last = (last - (1 / arrivalRate) * Math.log(generator.nextDouble()));
+			list.add(i, (Integer) (int) last);
 		}
 		list.remove(list.size()-1);
 		
 		return list;
 	}
 	
-	public double genUniformNum() {
+	public static double genUniformNum() {
 		double r = generator.nextDouble();		
 		return r*(rightLimit-leftLimit) + leftLimit;
 	}
