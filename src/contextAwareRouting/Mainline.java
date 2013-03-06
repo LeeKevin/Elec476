@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class Mainline {
-	
+		//System parameters to play with
 		public static final int T = 0;
 		public static final int Xmax = 0;
 		public static final int Ymax = 0;
@@ -19,12 +19,17 @@ public class Mainline {
 		//The source of all things random:
 		public static final RandomNumGen Rand = new RandomNumGen();
 		
-	public static void main(String[] args) {
+		//System attributes
+		private static UserNode[] Users = new UserNode[numUsers];
+		private static RelayNode[] Nodes = new RelayNode[numRelays]; 
+		private static CentralServer Server;
+		private static LinkedList<Request> Requests;
 		
+	public static void main(String[] args) {
 		 //Create nodes at random and central server 
 		 UserNode[] Users = createUserNodes(numUsers);
 		 RelayNode[] Relays = createRelayNodes(numRelays);
-		 CentralServer Server = new CentralServer(Users, Relays);
+		 Server = new CentralServer(Users, Relays);
 		 
 		 //Create random arrival times
 		 ArrayList<Integer> Arrival = Rand.poissonList(requestrate, maxtime);
@@ -38,18 +43,22 @@ public class Mainline {
 			 
 			 //create request if its time
 			 while (Arrival.remove((Integer) tick)){
-				 Server.createRequest();
+				 createRequest();
 			 }
-				 
+			 
+			 //other simulation things will be added here like removal of nodes and dropping of requests
+			 
+			 //Moves every request by a tick
+			 for (Request Current : Requests)
+				 Current.tick(tick);
+			 
+			//tick! 
 			 tick++;	 
 		 }
 	 }
 	 
 	 private static UserNode[] createUserNodes(int num){
-		 
-		 //Make master user node list
-		 UserNode[] Users = new UserNode[num];
-		 
+		 //variables to work with
 		 int x, y;		 
 		 
 		 //for each node
@@ -73,18 +82,13 @@ public class Mainline {
 			 LinkedList <Request> Queue = new LinkedList <Request>();
 			 
 			 //create new user node and add to the master list
-			 Users[i] = new UserNode(Apps, x, y, Queue);
-			 
+			 Users[i] = new UserNode(Apps, x, y, Queue); 
 		 }
 		 
 		 return Users;
 	 }	 
 	 
 	 private static RelayNode[] createRelayNodes( int num ){
-		 
-		 //Make master relay node list
-		 RelayNode[] Nodes = new RelayNode[num]; 
-		 
 		 //Variables to work with
 		 int x, y;		 
 		 
@@ -103,5 +107,26 @@ public class Mainline {
 		 }
 		 
 		 return Nodes;
-	 } 
+	 }
+	 
+	//creates a new request as it arrives at the source user node
+	public static void createRequest(){
+		//handles for the source and destination users
+		UserNode source = Users[(int) Mainline.Rand.nextDouble(0, numUsers -1)];
+		UserNode destination;
+		
+		//picks second user that is not the source
+		do{
+			destination = Users[(int) Mainline.Rand.nextDouble(0, numRelays -1)];
+		}while(source != destination);
+		
+		//a new request is born
+		Request arrival = new Request(source, destination, (int) Mainline.Rand.nextDouble(0, Mainline.numapps));
+		
+		//Add request to master list
+		Requests.add(arrival);
+		
+		//adds to queue for processing
+		Server.addRequest (arrival);
+	}
 }

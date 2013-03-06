@@ -51,24 +51,6 @@ public class CentralServer {
 		queue.add(newR);
 	}
 	
-	//creates a new request as it arrives at the source user node
-	public void createRequest(){
-		//handles for the source and destination users
-		UserNode source = userList[(int) Mainline.Rand.nextDouble(0, userList.length -1)];
-		UserNode destination;
-		
-		//picks second user that is not the source
-		do{
-			destination = userList[(int) Mainline.Rand.nextDouble(0, userList.length -1)];
-		}while(source != destination);
-		
-		//a new request is born
-		Request arrival = new Request(source, destination, (int) Mainline.Rand.nextDouble(0, Mainline.numapps));
-		
-		//adds to queue for processing
-		addRequest (arrival);
-	}
-	
 	private static int inrange(int x1, int y1, int x2, int y2){
 		//Pythagoras theorem
 		double distance = Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2));
