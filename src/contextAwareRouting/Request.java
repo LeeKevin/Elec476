@@ -4,7 +4,7 @@ public class Request {
 	//Request description attributes
 	private UserNode Source;
 	private UserNode Destination;
-	private int app;
+	private int App;
 	private RelayNode Current = null;
 	private enum State{NEW, QUEUE, INSERVICE, ARRIVED, DROPPED};
 	private State state;
@@ -12,12 +12,13 @@ public class Request {
 	//Request simulation data, array of int [start time, queue time, system time, dropped]
 	private int[] Data = new int[4];
 	
-	public Request(UserNode source, UserNode destination, int app){
+	public Request(UserNode source, UserNode destination, int app, int tick){
 		//setup
 		Source = source;
 		Destination = destination;
-		this.app = app;
+		App = app;
 		state = State.NEW;
+		Data[0] = tick;
 	}
 	
 	public void tick(int tick){
@@ -48,14 +49,46 @@ public class Request {
 		//switch case for changing state
 		switch (newState) {
 		case 2:
+			state = State.INSERVICE;
 			break;
 		case 3:
+			state = State.ARRIVED;
+			Current = null;
+			break;
+		case 4:
+			state = State.DROPPED;
+			Current = null;
+			Data[3] = 1;
 			break;
 		default:
-			throw 
-			break;
+			//throw new Exception("Invalid request state");
 		}
 	}
 	
+	public void setState(int newState, RelayNode current){
+		//overloaded method for changing state to QUEUE
+		if (newState==1){
+			state = State.QUEUE;
+			Current = current;
+		}else{
+			//throw new Exception("Invalid request state");
+		}
+	}
+
+	public UserNode getSource() {
+		return Source;
+	}
+
+	public UserNode getDestination() {
+		return Destination;
+	}
+	
+	public int getApp() {
+		return App;
+	}
+
+	public RelayNode getCurrent() {
+		return Current;
+	}
 	//Class not done, we need to implement setters and getters in a way that will allow the class to keep track of its own stats
 }

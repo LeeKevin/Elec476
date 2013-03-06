@@ -4,7 +4,7 @@ package contextAwareRouting;
 import java.util.LinkedList;
 
 public class UserNode {
-	
+	//Attributes
 	private boolean appList[];
 	private  LinkedList <Request>queue;
 	private int xpos;
@@ -12,13 +12,13 @@ public class UserNode {
 	
 	public UserNode( boolean inputAppList[], int inputXpos, int inputYpos, LinkedList <Request>inputQueue){
 		
-		setAppList(inputAppList);
-		setXpos(inputXpos);
-		setYpos(inputYpos);
-		setQueue(inputQueue);
+		appList = inputAppList;
+		xpos = inputXpos;
+		ypos = inputYpos;
+		queue = inputQueue;
 		
 	}
-
+/* There is no reason to have setters for this class, they can't and shouldn't change
 	public void setAppList( boolean[] appList){
 		this.appList = appList;
 	}
@@ -36,6 +36,7 @@ public class UserNode {
 		
 	}
 	
+*/	
 	public boolean[] getAppList(){
 		return appList;
 	}
@@ -48,8 +49,8 @@ public class UserNode {
 		return ypos;
 	}
 	
-	public LinkedList<Request> getQueue(){
-		return queue;
+	public int getQueue(){
+		return queue.size();
 	}
  	
 }

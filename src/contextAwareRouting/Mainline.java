@@ -12,7 +12,7 @@ public class Mainline {
 		public static final int numRelays = 0;
 		public static final int numapps = 0;
 		public static final int requestrate = 0;
-		public static final int queuerate = 0;
+		public static final int processrate = 0;
 		public static final int maxtime = 0;
 		public static final String [][] AppPref = new String[0][0];
 	
@@ -22,8 +22,9 @@ public class Mainline {
 		//System attributes
 		private static UserNode[] Users = new UserNode[numUsers];
 		private static RelayNode[] Nodes = new RelayNode[numRelays]; 
-		private static CentralServer Server;
+		public static CentralServer Server;
 		private static LinkedList<Request> Requests;
+		private static int tick;
 		
 	public static void main(String[] args) {
 		 //Create nodes at random and central server 
@@ -36,7 +37,7 @@ public class Mainline {
 		 
 		 //time setup
 		 boolean done = false;
-		 int tick = 0;
+		 tick = 0;
 		 
 		 //main simulation time loop
 		 while (!done){
@@ -46,11 +47,16 @@ public class Mainline {
 				 createRequest();
 			 }
 			 
-			 //other simulation things will be added here like removal of nodes and dropping of requests
+			 //other simulation events will be added here like removal of nodes and dropping of requests
 			 
-			 //Moves every request by a tick
+			 //Progress the system by one tick
 			 for (Request Current : Requests)
 				 Current.tick(tick);
+			 for (RelayNode Current : Relays)
+				 Current.tick();
+			 Server.tick();
+			 
+			 //graphics generation goes here
 			 
 			//tick! 
 			 tick++;	 
@@ -121,12 +127,12 @@ public class Mainline {
 		}while(source != destination);
 		
 		//a new request is born
-		Request arrival = new Request(source, destination, (int) Mainline.Rand.nextDouble(0, Mainline.numapps));
+		Request arrival = new Request(source, destination, (int) Mainline.Rand.nextDouble(0, Mainline.numapps), tick);
 		
 		//Add request to master list
 		Requests.add(arrival);
 		
-		//adds to queue for processing
+		//send the request for processing
 		Server.addRequest (arrival);
 	}
 }

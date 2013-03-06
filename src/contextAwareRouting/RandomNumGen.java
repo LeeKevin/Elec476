@@ -51,4 +51,8 @@ public class RandomNumGen extends Random{
 		return r*(high-low) + low;
 	}
 	
+	public double nextExp(int rate){
+		return (-Math.log(nextDouble())/rate);
+	}
+	
 }
