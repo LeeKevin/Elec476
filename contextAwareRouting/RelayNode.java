@@ -3,7 +3,7 @@ package contextAwareRouting;
 import java.util.LinkedList;
 
 public class RelayNode {
-	
+	//Node attributes
 	private  LinkedList <Request> Queue;
 	private int processing;
 	private int xpos;
@@ -18,15 +18,35 @@ public class RelayNode {
 	}
 	
 	public void tick(){
-		//logic for moving requests including manipulating the state
+		//If processing, count down the ticks until done then send request to server
+		if (processing > 1){
+			processing --;
+		}else if(processing == 1){
+			processing--;
+			Mainline.Server.addRequest(Queue.remove());
+		//If Idle then check if there is anything in the queue and start processing
+		}else if(processing ==-1 && Queue.size()>0){
+			processing = (int) Mainline.Rand.nextExp(Mainline.processrate);
+			Queue.element().setState(2);
+		}
 	}
 	
+	public void doneRequest(){
+		if (Queue.size()>0){
+			processing = (int) Mainline.Rand.nextExp(Mainline.processrate);
+			Queue.element().setState(2);
+		} else {
+			processing = -1;
+		}
+	}
+	
+	//method for sending a request to the node
 	public void addRequest(Request Arrival){
-		Arrival.setState("QUEUE");
+		Arrival.setState(1, this);
 		Queue.add(Arrival);
 	}
 	
-	public int queueLength(){
+	public int getQueue(){
 		return Queue.size();
 	}
 	
