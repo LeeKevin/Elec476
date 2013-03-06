@@ -10,15 +10,27 @@ public class RelayNode {
 	private int ypos;
 	
 	public RelayNode(int inputXpos, int inputYpos){
-		
+		//Setups
 		Queue = new LinkedList<Request>();
 		processing = 0;
 		xpos = inputXpos;
 		ypos = inputYpos;
-		
-	}	
+	}
 	
-	int getProcessing(){
+	public void tick(){
+		//logic for moving requests including manipulating the state
+	}
+	
+	public void addRequest(Request Arrival){
+		Arrival.setState("QUEUE");
+		Queue.add(Arrival);
+	}
+	
+	public int queueLength(){
+		return Queue.size();
+	}
+	
+	public int getProcessing(){
 		return processing;
 	}
 	
