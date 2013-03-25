@@ -6,7 +6,7 @@ public class CentralServer {
 	
 	private UserNode[] userList; //master user list
 	private RelayNode[] relayList; //master relay list
-	private LinkedList <Request>queue;
+	private LinkedList <Request>queue = new LinkedList<Request>();
 	private int[][] adjMat; //Adjacency Matrix
 	
 	public CentralServer(UserNode[] Users, RelayNode[] Relays){
@@ -21,6 +21,7 @@ public class CentralServer {
 	
 	//creates a weighted adjacency matrix
 	private void createAdjMat(){
+		adjMat = new int [userList.length+relayList.length][userList.length+relayList.length];
 		//Loops through all nodes
 		for (int i=0; i<userList.length; i++){
 			//user node to user node first (top left of matrix)
@@ -60,13 +61,14 @@ public class CentralServer {
 			return 0;
 	}
 	
+	@SuppressWarnings("null")
 	public void tick(){
 		//the time dependent operation of the server goes here. It should end with the server sending a request on it's way
 		
 		//Instantiation of variable handles 
-		Request	current; //this is the next request in line to be serviced
-		RelayNode source; //this is the current node that the current request is at (current.current, null if request is new, arrived, dropped)
-		RelayNode destination; //the next node that the request is heading to. to be determined by algorithm (special condition if about to finish journey)
+		Request	current = queue.getFirst(); //this is the next request in line to be serviced
+		RelayNode source = current.getCurrent(); //this is the current node that the current request is at (current.current, null if request is new, arrived, dropped)
+		RelayNode destination = null; //the next node that the request is heading to. to be determined by algorithm (special condition if about to finish journey)
 		
 
 		//Algorithm goes here

@@ -5,15 +5,15 @@ import java.util.LinkedList;
 
 public class Mainline {
 		//System parameters to play with
-		public static final int T = 0;
-		public static final int Xmax = 0;
-		public static final int Ymax = 0;
-		public static final int numUsers = 0;
-		public static final int numRelays = 0;
-		public static final int numapps = 0;
-		public static final int requestrate = 0;
+		public static final int T = 10;
+		public static final int Xmax = 20;
+		public static final int Ymax = 20;
+		public static final int numUsers = 10;
+		public static final int numRelays = 10;
+		public static final int numapps = 3;
+		public static final int requestrate = 1;
 		public static final int processrate = 0;
-		public static final int maxtime = 0;
+		public static final int maxtime = 10;
 		public static final String [][] AppPref = new String[0][0];
 	
 		//The source of all things random:
@@ -23,7 +23,7 @@ public class Mainline {
 		private static UserNode[] Users = new UserNode[numUsers];
 		private static RelayNode[] Nodes = new RelayNode[numRelays]; 
 		public static CentralServer Server;
-		private static LinkedList<Request> Requests;
+		private static LinkedList<Request> Requests = new LinkedList<Request>();
 		private static int tick;
 		
 	public static void main(String[] args) {
