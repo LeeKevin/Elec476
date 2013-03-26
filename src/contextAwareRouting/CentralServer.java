@@ -8,12 +8,22 @@ public class CentralServer {
 	private RelayNode[] relayList; //master relay list
 	private LinkedList <Request>queue = new LinkedList<Request>();
 	private int[][] adjMat; //Adjacency Matrix
+	private LinkedList<Object> masterList = new LinkedList<Object>();
+
 	
 	public CentralServer(UserNode[] Users, RelayNode[] Relays){
 		
 		//Setup attributes
 		userList = Users;
 		relayList = Relays;
+		
+		
+		for (int i=0; i<this.userList.length; i++) {
+			masterList.add(this.userList[i]);
+		}
+		for (int i=0; i<this.relayList.length; i++) {
+			masterList.add(this.relayList[i]);
+		}
 		
 		//create weighted adjacency matrix
 		createAdjMat();
@@ -68,11 +78,14 @@ public class CentralServer {
 		//Instantiation of variable handles 
 		Request	current = queue.getFirst(); //this is the next request in line to be serviced
 		RelayNode source = current.getCurrent(); //this is the current node that the current request is at (current.current, null if request is new, arrived, dropped)
-		RelayNode destination = null; //the next node that the request is heading to. to be determined by algorithm (special condition if about to finish journey)
+		UserNode finalNode = current.getDestination(); //the next node that the request is heading to. to be determined by algorithm (special condition if about to finish journey)
 		
 
 		//Algorithm goes here
+		DijkstrasAlg g = new DijkstrasAlg(adjMat, source.getID(), finalNode.getID(), adjMat.length);
+		int[] path = g.SPA();
 		
+		destination = masterList[path[path.length - 2]];
 		
 		//this is how it needs to end in order to interface properly
 		//start (user to relay)

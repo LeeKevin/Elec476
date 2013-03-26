@@ -88,7 +88,7 @@ public class Mainline {
 			 LinkedList <Request> Queue = new LinkedList <Request>();
 			 
 			 //create new user node and add to the master list
-			 Users[i] = new UserNode(Apps, x, y, Queue); 
+			 Users[i] = new UserNode(Apps, x, y, Queue, i); 
 		 }
 		 
 		 return Users;
@@ -108,7 +108,7 @@ public class Mainline {
 			 } while (Math.pow(x/Xmax, 2) + Math.pow(y/Ymax, 2) > 1);
 			 
 			 //create new relay node and add to the master list
-			 Nodes[i] = new RelayNode(x, y);
+			 Nodes[i] = new RelayNode(x, y, Users.length + i);
 			 
 		 }
 		 
@@ -124,7 +124,7 @@ public class Mainline {
 		//picks second user that is not the source
 		do{
 			destination = Users[(int) Mainline.Rand.nextDouble(0, numRelays -1)];
-		}while(source != destination);
+		}while(source.equals(destination));
 		
 		//a new request is born
 		Request arrival = new Request(source, destination, (int) Mainline.Rand.nextDouble(0, Mainline.numapps), tick);

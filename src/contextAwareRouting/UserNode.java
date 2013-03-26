@@ -4,14 +4,17 @@ package contextAwareRouting;
 import java.util.LinkedList;
 
 public class UserNode {
+	
+	private int id;
+
 	//Attributes
 	private boolean appList[];
 	private  LinkedList <Request>queue;
 	private int xpos;
 	private int ypos;
 	
-	public UserNode( boolean inputAppList[], int inputXpos, int inputYpos, LinkedList <Request>inputQueue){
-		
+	public UserNode( boolean inputAppList[], int inputXpos, int inputYpos, LinkedList <Request>inputQueue, int id){
+		this.id = id;
 		appList = inputAppList;
 		xpos = inputXpos;
 		ypos = inputYpos;
@@ -51,6 +54,30 @@ public class UserNode {
 	
 	public int getQueue(){
 		return queue.size();
+	}
+	
+	@Override
+	public boolean equals(Object o) 
+	{
+	    if (o instanceof UserNode) 
+	    {
+	      UserNode c = (UserNode) o;
+	      
+	      if (this.appList.length == c.appList.length) {
+		      for (int i = 0; i<this.appList.length; i++) {
+		    	  if (this.appList[i] ^ c.appList[i])
+		    		  return false;
+		      }
+	      } else return false;
+	      
+	      if (this.queue.equals(c.queue) && this.xpos == c.xpos && this.ypos == c.ypos) return true;
+
+	    }
+	    return false;
+	}
+
+	public int getID() {
+		return id;
 	}
  	
 }

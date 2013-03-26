@@ -4,12 +4,14 @@ import java.util.LinkedList;
 
 public class RelayNode {
 	//Node attributes
+	private int id;
+	
 	private  LinkedList <Request> Queue;
 	private int processing;
 	private int xpos;
 	private int ypos;
 	
-	public RelayNode(int inputXpos, int inputYpos){
+	public RelayNode(int inputXpos, int inputYpos, int id){
 		//Setups
 		Queue = new LinkedList<Request>();
 		processing = 0;
@@ -21,7 +23,7 @@ public class RelayNode {
 		//If processing, count down the ticks until done then send request to server
 		if (processing > 1){
 			processing --;
-		}else if(processing == 1){
+		}else if(processing == 1) {
 			processing--;
 			Mainline.Server.addRequest(Queue.remove());
 		//If Idle then check if there is anything in the queue and start processing
@@ -60,5 +62,9 @@ public class RelayNode {
 
 	public int getYpos() {
 		return ypos;
+	}
+	
+	public int getID() {
+		return id;
 	}
 }
