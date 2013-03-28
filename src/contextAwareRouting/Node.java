@@ -47,7 +47,7 @@ public class Node {
 	}
 
 	public void addRequest (Request request) {
-		request.setState(1, this);
+		request.setState(1, nodeID);
 		queue.add(request);
 	}
 	

@@ -77,12 +77,12 @@ public class CentralServer {
 		
 		//Instantiation of variable handles 
 		Request	current = queue.getFirst(); //this is the next request in line to be serviced
-		RelayNode source = current.getCurrent(); //this is the current node that the current request is at (current.current, null if request is new, arrived, dropped)
-		UserNode finalNode = current.getDestination(); //the next node that the request is heading to. to be determined by algorithm (special condition if about to finish journey)
+		int sourceNodeID = current.getCurrentNodeID(); //this is the current node that the current request is at (current.current, null if request is new, arrived, dropped)
+		int destinationNodeID = current.getDestinationNodeID(); //the next node that the request is heading to. to be determined by algorithm (special condition if about to finish journey)
 		
 
 		//Algorithm goes here
-		DijkstrasAlg g = new DijkstrasAlg(adjMat, source.getID(), finalNode.getID(), adjMat.length);
+		DijkstrasAlg g = new DijkstrasAlg(adjMat, sourceNodeID, destinationNodeID, adjMat.length);
 		int[] path = g.SPA();
 		
 //		destination = masterList[path[path.length - 2]];
@@ -96,7 +96,7 @@ public class CentralServer {
 //		destination.addRequest(current);
 		
 		//end (relay to user)
-		source.doneRequest();
+//		source.doneRequest();
 		current.setState(3);
 		
 	}

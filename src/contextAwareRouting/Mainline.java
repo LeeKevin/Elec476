@@ -77,18 +77,15 @@ public class Mainline {
 			 } while (Math.pow(x/Xmax, 2) + Math.pow(y/Ymax, 2) > 1);
 			 
 			 //generates new array for each node
-			 boolean[] Apps = new boolean[numapps];
+			 ArrayList<Integer> appList = new ArrayList<Integer>();
 			 
 			 //fills it randomly
 			 for (int j = 0; j<numapps; j++){
-				 Apps[j] = Rand.nextBoolean();
+				 appList.add(Rand.nextInt());
 			 }
 			 
-			 //generates an empty list for the queue
-			 LinkedList <Request> Queue = new LinkedList <Request>();
-			 
 			 //create new user node and add to the master list
-			 Users[i] = new UserNode(Apps, x, y, Queue, i); 
+			 Users[i] = new UserNode(i, x, y, appList); 
 		 }
 		 
 		 return Users;
@@ -127,7 +124,7 @@ public class Mainline {
 		}while(source.equals(destination));
 		
 		//a new request is born
-		Request arrival = new Request(source, destination, (int) Mainline.Rand.nextDouble(0, Mainline.numapps), tick);
+		Request arrival = new Request(source.getNodeID(), destination.getNodeID(), (int) Mainline.Rand.nextDouble(0, Mainline.numapps), tick);
 		
 		//Add request to master list
 		Requests.add(arrival);
