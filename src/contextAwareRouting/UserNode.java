@@ -1,83 +1,39 @@
 package contextAwareRouting;
 
-//import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
-public class UserNode {
-	
-	private int id;
+public class UserNode extends Node{
 
-	//Attributes
-	private boolean appList[];
-	private  LinkedList <Request>queue;
-	private int xpos;
-	private int ypos;
-	
-	public UserNode( boolean inputAppList[], int inputXpos, int inputYpos, LinkedList <Request>inputQueue, int id){
-		this.id = id;
-		appList = inputAppList;
-		xpos = inputXpos;
-		ypos = inputYpos;
-		queue = inputQueue;
-		
+	private ArrayList<Integer> appList;
+
+	public UserNode(int nodeID, int xpos, int ypos) {
+		super(nodeID, xpos, ypos);
+		this.appList = new ArrayList<Integer>();		
 	}
-/* There is no reason to have setters for this class, they can't and shouldn't change
-	public void setAppList( boolean[] appList){
-		this.appList = appList;
+	public UserNode(int nodeID, int xpos, int ypos, LinkedList<Request> queue) {
+		super(nodeID, xpos, ypos, queue);
+		this.appList = new ArrayList<Integer>();		
 	}
-	
-	public void setXpos(int xpos){
-		this.xpos = xpos;
+	public UserNode(int nodeID, int xpos, int ypos, ArrayList<Integer> appList) {
+		super(nodeID, xpos, ypos);
+		this.appList = appList;		
 	}
-	
-	public void setYpos(int ypos){
-		this.ypos = ypos;
+	public UserNode(int nodeID, int xpos, int ypos, LinkedList<Request> queue, ArrayList<Integer> appList) {
+		super(nodeID, xpos, ypos);
+		this.appList = new ArrayList<Integer>();		
 	}
-	
-	public void setQueue(LinkedList <Request>queue){
-		this.queue = queue;
-		
-	}
-	
-*/	
-	public boolean[] getAppList(){
+
+	public ArrayList<Integer> getAppList(){
 		return appList;
-	}
+	} 	
 	
-	public int getXpos(){
-		return xpos;
-	}
+	public void addApp(Integer app){
+		appList.add(app);
+	} 	
 	
-	public int getYpos(){
-		return ypos;
-	}
-	
-	public int getQueue(){
-		return queue.size();
-	}
-	
-	@Override
-	public boolean equals(Object o) 
-	{
-	    if (o instanceof UserNode) 
-	    {
-	      UserNode c = (UserNode) o;
-	      
-	      if (this.appList.length == c.appList.length) {
-		      for (int i = 0; i<this.appList.length; i++) {
-		    	  if (this.appList[i] ^ c.appList[i])
-		    		  return false;
-		      }
-	      } else return false;
-	      
-	      if (this.queue.equals(c.queue) && this.xpos == c.xpos && this.ypos == c.ypos) return true;
-
-	    }
-	    return false;
-	}
-
-	public int getID() {
-		return id;
-	}
- 	
+	public void remove(Integer app){
+		if (appList.contains(app))
+		    appList.remove(appList.indexOf(app));
+	} 	
 }

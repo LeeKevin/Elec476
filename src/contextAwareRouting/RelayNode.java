@@ -2,21 +2,16 @@ package contextAwareRouting;
 
 import java.util.LinkedList;
 
-public class RelayNode {
-	//Node attributes
-	private int id;
+public class RelayNode extends Node{
+
+	private int processing = 0;
+
+	public RelayNode(int nodeID, int xpos, int ypos) {
+		super(nodeID, xpos, ypos);
+	}
 	
-	private  LinkedList <Request> Queue;
-	private int processing;
-	private int xpos;
-	private int ypos;
-	
-	public RelayNode(int inputXpos, int inputYpos, int id){
-		//Setups
-		Queue = new LinkedList<Request>();
-		processing = 0;
-		xpos = inputXpos;
-		ypos = inputYpos;
+	public RelayNode(int nodeID, int xpos, int ypos, LinkedList<Request> queue) {
+		super(nodeID, xpos, ypos, queue);
 	}
 	
 	public void tick(){
@@ -25,46 +20,24 @@ public class RelayNode {
 			processing --;
 		}else if(processing == 1) {
 			processing--;
-			Mainline.Server.addRequest(Queue.remove());
+			Mainline.Server.addRequest(super.removeRequest());
 		//If Idle then check if there is anything in the queue and start processing
-		}else if(processing ==-1 && Queue.size()>0){
+		}else if(processing ==-1 && super.getQueueSize()>0){
 			processing = (int) Mainline.Rand.nextExp(Mainline.processrate);
-			Queue.element().setState(2);
+			super.getNextRequest().setState(2);
 		}
 	}
 	
 	public void doneRequest(){
-		if (Queue.size()>0){
+		if (super.getQueueSize()>0){
 			processing = (int) Mainline.Rand.nextExp(Mainline.processrate);
-			Queue.element().setState(2);
+			super.getNextRequest().setState(2);
 		} else {
 			processing = -1;
 		}
 	}
 	
-	//method for sending a request to the node
-	public void addRequest(Request Arrival){
-		Arrival.setState(1, this);
-		Queue.add(Arrival);
-	}
-	
-	public int getQueue(){
-		return Queue.size();
-	}
-	
 	public int getProcessing(){
 		return processing;
-	}
-	
-	public int getXpos() {
-		return xpos;
-	}
-
-	public int getYpos() {
-		return ypos;
-	}
-	
-	public int getID() {
-		return id;
 	}
 }

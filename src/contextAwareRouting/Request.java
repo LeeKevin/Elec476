@@ -5,7 +5,7 @@ public class Request {
 	private UserNode Source;
 	private UserNode Destination;
 	private int App;
-	private RelayNode Current = null;
+	private Node Current = null;
 	private enum State{NEW, QUEUE, INSERVICE, ARRIVED, DROPPED};
 	private State state;
 	
@@ -65,7 +65,7 @@ public class Request {
 		}
 	}
 	
-	public void setState(int newState, RelayNode current){
+	public void setState(int newState, Node current){
 		//overloaded method for changing state to QUEUE
 		if (newState==1){
 			state = State.QUEUE;
@@ -87,7 +87,7 @@ public class Request {
 		return App;
 	}
 
-	public RelayNode getCurrent() {
+	public Node getCurrent() {
 		return Current;
 	}
 	//Class not done, we need to implement setters and getters in a way that will allow the class to keep track of its own stats
