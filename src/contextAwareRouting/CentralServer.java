@@ -6,14 +6,16 @@ import java.util.LinkedList;
 public class CentralServer {
 
 	private ArrayList<Node> nodeList = new ArrayList<Node>(); //master user list
-	private LinkedList <Request>queue = new LinkedList<Request>();
-	private boolean[][] inContactMatrix; //Adjacency Matrix
+	private LinkedList<Integer> queue = new LinkedList<Integer>(); //holds nodes Ids request to be handled 
+																	// Node Id is position in nodelist;
+	private int[][] inContactMatrix; //Adjacency Matrix
 
 	private int numUsers;
 	private int numRelays;
 	private int totalNodes;
-	private int CLK; 
+ 
 
+	//private static 
 
 	public CentralServer(ArrayList<UserNode> userList, ArrayList<RelayNode> relayList){
 		nodeList.addAll(userList);
@@ -27,12 +29,16 @@ public class CentralServer {
 	}
 
 	public void updateInContactMatrix(){
-		inContactMatrix = new boolean [totalNodes][totalNodes];
+		inContactMatrix = new int [totalNodes][totalNodes];
 		for (int i=0; i<totalNodes; i++){
 			for (int j=i+1; j<totalNodes; j++){
 				boolean inRange = inRange(nodeList.get(i).getXpos(), nodeList.get(i).getYpos(), nodeList.get(j).getXpos(), nodeList.get(j).getYpos());
-				inContactMatrix[i][j] = inRange;
-				inContactMatrix[j][i] = inRange;
+					if(inRange){
+						//Get queue lengths for each element of nodelist
+						int length = nodeList.get(i).getQueue().size();
+						inContactMatrix[i][j] = length;
+						inContactMatrix[j][i] = length;
+					}
 			}
 		}
 	}
@@ -48,29 +54,62 @@ public class CentralServer {
 	}
 
 	@SuppressWarnings("null")
-	public void tick(){
+	public void handleRequests(){
+		
 		//the time dependent operation of the server goes here. It should end with the server sending a request on it's way
-
 		// How to handle these requests:
 		//		-Request for user nodes
 		//		-Request for relay nodes
 		
-		
+		//for all requests
+		for(int i = 0; i < queue.size(); i++){
+			Node node = getNodeViaID(queue.get(i));
+			
+			if (node instanceof RelayNode){
+				handleRelayNode( (RelayNode) node);
+			}
+			else if(node instanceof UserNode){
+				handleUserNode( (UserNode) node);
+			}
+		}
 		
 		//Instantiation of variable handles 
-		Request	current = queue.getFirst(); //this is the next request in line to be serviced
+		int	current = queue.getFirst(); //this is the next request in line to be serviced
 		//int sourceNodeID = current.getCurrentNodeID(); //this is the current node that the current request is at (current.current, null if request is new, arrived, dropped)
 		//int destinationNodeID = current.getDestinationNodeID(); //the next node that the request is heading to. to be determined by algorithm (special condition if about to finish journey)
 
-		current.setState(3);
+		//current.setState(3);
 
 	}
 
-	public void addRequest(Request request) {
-		queue.add(request);
+	public void addRequest(int nodeId) {
+		queue.add(nodeId);
 	}
 
-	public Request removeRequest() {
+	public int removeRequest() {
 		return queue.remove();
+	}
+
+	private Node getNodeViaID(int id){
+		return nodeList.get(id);
+	}
+	
+	private void handleUserNode(UserNode user){
+		
+	}
+	
+	private void handleRelayNode(RelayNode relay){
+		
+		LinkedList<Request> tmpQueue = relay.getQueue();
+		Request toProcess = tmpQueue.getFirst();
+		int nextNodeID = getNextNode(toProcess);
+		Request.setCurrentNodeID(nextNodeID);
+		
+	}
+	
+	private int getNextNode(Request request){
+		DijkstrasAlg nextNode = new DijkstrasAlg(inContactMatrix, request.getCurrentNodeID(), 
+										request.getDestinationNodeID(), inContactMatrix.length  );
+		return nextNode.getPath()[nextNode.getPath().length - 2];
 	}
 }

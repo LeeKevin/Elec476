@@ -83,6 +83,9 @@ public class Request {
 			//throw new Exception("Invalid request state");
 		}
 	}
+	public void setCurrentNodeID(int currentNodeID){
+		this.currentNodeID = currentNodeID;
+	}
 
 	public int getSourceNodeID() {
 		return sourceNodeID;
