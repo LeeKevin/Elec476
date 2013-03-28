@@ -24,7 +24,7 @@ public class Mainline {
 	public static CentralServer server = new CentralServer(userList, relayList);
 	private static LinkedList<Request> requestList = new LinkedList<Request>();
 	private static int time;
-	
+
 
 	public void main(String[] args) {
 
@@ -47,7 +47,7 @@ public class Mainline {
 				Current.tick(time);
 			for (RelayNode Current : relayList)
 				Current.tick();
-//			server.tick();
+			//			server.tick();
 
 			//graphics generation goes here
 
@@ -60,7 +60,7 @@ public class Mainline {
 		//variables to work with
 		int x, y;		 
 		ArrayList<UserNode> userList = new ArrayList<UserNode>(numUsers);
-		
+
 		//for each node
 		for(int i = 0; i<numUsers; i++){
 
@@ -123,6 +123,6 @@ public class Mainline {
 		requestList.add(arrival);
 
 		//send the request for processing
-//		server.addRequest (arrival);
+		//		server.addRequest (arrival);
 	}
 }

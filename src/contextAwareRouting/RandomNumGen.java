@@ -6,21 +6,6 @@ import java.util.Random;
 public class RandomNumGen {
 	
 	Random generator = new Random();
-	
-	public static void main(String[] args) {
-		
-		boolean done = false;
-		for (int i=0; !done; i++) {
-			if(i==5) done = true;
-		}
-		
-//		RandomNumGen generator = new RandomNumGen();
-//		LinkedList<Integer> list = generator.poissonList(2, 100);
-//		for (int i=0;i<list.size();i++){
-//			System.out.println(list.get(i));
-//		}
-		
-	}
 
 	public RandomNumGen() {
 	}
