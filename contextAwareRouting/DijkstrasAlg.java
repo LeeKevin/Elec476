@@ -17,6 +17,7 @@ public class DijkstrasAlg {
 	int[][] weight = new int[MAXNODES][MAXNODES];
 	int[] distance = new int[MAXNODES];
 	int[] precede = new int[MAXNODES];
+	int[] path;
 
 
 	/**
@@ -155,7 +156,16 @@ public class DijkstrasAlg {
 
 		int[] path = getShortestPath();
 		displayResult(path);
+		this.path = path;
 
+		return path;
+	}
+	
+	public void setPath(int[] path){
+		this.path = path;
+	}
+	
+	public int[] getPath(){
 		return path;
 	}
 
