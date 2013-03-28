@@ -47,7 +47,7 @@ public class Mainline {
 				Current.tick(time);
 			for (RelayNode Current : relayList)
 				Current.tick();
-			server.tick();
+//			server.tick();
 
 			//graphics generation goes here
 
@@ -85,12 +85,13 @@ public class Mainline {
 		return userList;
 	}	 
 
-	private static ArrayList<RelayNode> createRelayNodes( int num ){
+	private static ArrayList<RelayNode> createRelayNodes( int numRelays ){
 		//Variables to work with
 		int x, y;		 
+		ArrayList<RelayNode> relayList = new ArrayList<RelayNode>(numRelays);
 
 		//for each node
-		for(int i = 0; i<num; i++){
+		for(int i = 0; i<numRelays; i++){
 
 			//generate random x,y
 			do {
@@ -99,7 +100,7 @@ public class Mainline {
 			} while (Math.pow(x/R, 2) + Math.pow(y/R, 2) > 1);
 
 			//create new relay node and add to the master list
-			relayList.add(new RelayNode(x, y, userList.size() + i));
+			relayList.add(new RelayNode(userList.size() + i, x, y));
 
 		}
 
@@ -122,6 +123,6 @@ public class Mainline {
 		requestList.add(arrival);
 
 		//send the request for processing
-		server.addRequest (arrival);
+//		server.addRequest (arrival);
 	}
 }

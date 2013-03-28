@@ -8,6 +8,10 @@ public class Node {
 	private int xpos;
 	private int ypos;
 	private  LinkedList<Request> queue;
+	private int serviceTime;
+	private boolean waiting;
+	private int nextNodeID;
+	private boolean handlingRequest;
 
 	public Node (int nodeID, int xpos, int ypos) {
 		this.nodeID = nodeID;
@@ -15,6 +19,10 @@ public class Node {
 		this.xpos = xpos;
 		this.ypos = ypos;
 		this.queue = new LinkedList<Request>();
+		
+		this.setServiceTime(0);
+		this.setWaiting(false);
+		this.setHandlingRequest(false);
 	}
 
 	public Node (int nodeID, int xpos, int ypos, LinkedList<Request> queue) {
@@ -63,6 +71,41 @@ public class Node {
 		return queue;
 	}
 
+	public int getServiceTime() {
+		return serviceTime;
+	}
 
+	public void setServiceTime(int serviceTime) {
+		this.serviceTime = serviceTime;
+	}
+
+	public boolean isWaiting() {
+		return waiting;
+	}
+
+	public void setWaiting(boolean waiting) {
+		this.waiting = waiting;
+	}
+
+	public int getNextNodeID() {
+		return nextNodeID;
+	}
+
+	public void setNextNodeID(int nextNodeID) {
+		this.nextNodeID = nextNodeID;
+	}
+
+	public boolean isHandlingRequest() {
+		return handlingRequest;
+	}
+
+	public void setHandlingRequest(boolean handlingRequest) {
+		this.handlingRequest = handlingRequest;
+	}
+
+	public void deployRequest() {
+		Request request = queue.remove();
+		request.setCurrentNodeID(nextNodeID);
+	}
 
 }

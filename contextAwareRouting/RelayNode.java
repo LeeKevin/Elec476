@@ -20,7 +20,7 @@ public class RelayNode extends Node{
 			processing --;
 		}else if(processing == 1) {
 			processing--;
-			Mainline.server.addRequest(super.removeRequest());
+//			Mainline.server.addRequest(super.removeRequest());
 			//If Idle then check if there is anything in the queue and start processing
 		}else if(processing ==-1 && super.getQueueSize()>0){
 			processing = (int) Mainline.generator.nextExp(Mainline.processrate);
