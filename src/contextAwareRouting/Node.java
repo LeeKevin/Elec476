@@ -43,20 +43,16 @@ public class Node {
 	}
 
 	public Request getNextRequest() {
-		return queue.get(0);
+		return queue.getFirst();
 	}
 
 	public void addRequest (Request request) {
 		request.setState(1, nodeID);
 		queue.add(request);
 	}
-	
+
 	public Request removeRequest() {
-		return queue.remove(0);
-	}
-	
-	public Request removeRequest(int i) {
-		return queue.remove(i);
+		return queue.remove();
 	}
 
 	public int getQueueSize() {

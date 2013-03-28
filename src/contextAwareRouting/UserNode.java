@@ -27,13 +27,17 @@ public class UserNode extends Node{
 	public ArrayList<Integer> getAppList(){
 		return appList;
 	} 	
-	
+
 	public void addApp(Integer app){
 		appList.add(app);
 	} 	
-	
+
 	public void remove(Integer app){
 		if (appList.contains(app))
-		    appList.remove(appList.indexOf(app));
+			appList.remove(appList.indexOf(app));
 	} 	
+	
+	public void handleRequests() {
+		
+	}
 }
