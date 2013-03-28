@@ -85,15 +85,15 @@ public class CentralServer {
 		DijkstrasAlg g = new DijkstrasAlg(adjMat, source.getID(), finalNode.getID(), adjMat.length);
 		int[] path = g.SPA();
 		
-		destination = masterList[path[path.length - 2]];
-		
-		//this is how it needs to end in order to interface properly
-		//start (user to relay)
-		destination.addRequest(current);
-		
-		//middle (relay to relay)
-		source.doneRequest();
-		destination.addRequest(current);
+//		destination = masterList[path[path.length - 2]];
+//		
+//		//this is how it needs to end in order to interface properly
+//		//start (user to relay)
+//		destination.addRequest(current);
+//		
+//		//middle (relay to relay)
+//		source.doneRequest();
+//		destination.addRequest(current);
 		
 		//end (relay to user)
 		source.doneRequest();

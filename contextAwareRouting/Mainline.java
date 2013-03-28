@@ -33,7 +33,7 @@ public class Mainline {
 		 Server = new CentralServer(Users, Relays);
 		 
 		 //Create random arrival times
-		 ArrayList<Integer> Arrival = Rand.poissonList(requestrate, maxtime);
+		 ArrayList<Double> Arrival = Rand.poissonList(requestrate, maxtime);
 		 
 		 //time setup
 		 boolean done = false;

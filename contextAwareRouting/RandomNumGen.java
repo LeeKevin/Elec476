@@ -3,11 +3,29 @@ package contextAwareRouting;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class RandomNumGen extends Random{
-	/*
-	private static double leftLimit;
-	private static double rightLimit;
+public class RandomNumGen {
+	
+	private double leftLimit;
+	private double rightLimit;
 	private RNGtype type;
+	Random generator = new Random();
+	
+	public static void main(String[] args) {
+		
+//		RandomNumGen generator = new RandomNumGen();
+//		ArrayList<Double> list = generator.poissonList(2, 100);
+//		for (int i=0;i<list.size();i++){
+//			System.out.println(list.get(i));
+//		}
+		
+		RandomNumGen generator2 = new RandomNumGen(-10,10);
+
+		ArrayList<Double> list2 = generator2.uniformList(100);
+		for (int i=0;i<list2.size();i++){
+			System.out.println(list2.get(i));
+		}
+		
+	}
 	
 	public RandomNumGen(double leftLimit, double rightLimit) {
 		this.leftLimit = leftLimit;
@@ -18,41 +36,50 @@ public class RandomNumGen extends Random{
 	public RandomNumGen() {
 		this.type = RNGtype.POISSON;
 	}
-	*/
-	
-	public ArrayList<Double> uniformList (int size, int low, int high) {
+
+	public ArrayList<Double> uniformList (int size) {
 		int i;
 		ArrayList<Double> list = new ArrayList<Double>();
 		list.clear();
 		for (i=0; i<size; i++) {
-			list.add(nextDouble(low, high));
+			list.add(genUniformNum());
 		}
 		
 		return list;
 	}
 	
-	public ArrayList<Integer> poissonList(int arrivalRate, int maxTime) {
-		ArrayList<Integer> list = new ArrayList<Integer>();
-		list.clear();
-		list.add(0,(Integer) 0);
-		double last = 0;
+	public ArrayList<Double> poissonList(double arrivalRate, double maxTime) {
 		
-		for (int i=1; last < maxTime; i++) {
-			last = (last - (1 / arrivalRate) * Math.log(nextDouble()));
-			list.add(i, (Integer) (int) last);
+		int i=0;
+		ArrayList<Double> list = new ArrayList<Double>();
+		list.clear();
+		list.add(0,(double) 0);
+		
+		while (list.get(i) < maxTime) {
+			i++;
+			list.add(i, list.get(i-1) - (1 / arrivalRate) * Math.log(generator.nextDouble()));
 		}
 		list.remove(list.size()-1);
 		
 		return list;
 	}
 	
+	public double genUniformNum() {
+		double r = generator.nextDouble();		
+		return r*(rightLimit-leftLimit) + leftLimit;
+	}
+	
 	public double nextDouble(int low, int high) {
-		double r = nextDouble();		
+		double r = generator.nextDouble();		
 		return r*(high-low) + low;
 	}
 	
 	public double nextExp(int rate){
-		return (-Math.log(nextDouble())/rate);
+		return (-Math.log(generator.nextDouble())/rate);
+	}
+	
+	public boolean nextBoolean(){
+		return (generator.nextBoolean());
 	}
 	
 }
