@@ -82,4 +82,8 @@ public class RandomNumGen {
 		return (generator.nextBoolean());
 	}
 	
+	public int nextInt(){
+		return (generator.nextInt());
+	}
+	
 }

@@ -1,38 +1,49 @@
 package contextAwareRouting;
 
+import java.util.EnumMap;
+
 public class Request {
+	
 	//Request description attributes
-	private UserNode Source;
-	private UserNode Destination;
-	private int App;
-	private Node Current = null;
+	private int sourceNodeID;
+	private int destinationNodeID;
+	private int currentNodeID;
+
+	private int app;
 	private enum State{NEW, QUEUE, INSERVICE, ARRIVED, DROPPED};
 	private State state;
 	
 	//Request simulation data, array of int [start time, queue time, system time, dropped]
-	private int[] Data = new int[4];
+	private enum DataType{STARTTIME, QUEUETIME, SYSTEMTIME, DROPPEDFLAG};
+	private EnumMap<DataType,Integer> Data = new EnumMap<DataType,Integer>(DataType.class);
+//	private int[] Data = new int[4];
 	
-	public Request(UserNode source, UserNode destination, int app, int tick){
+	public Request(int sourceNodeID, int destinationNodeID, int app, int tick){
 		//setup
-		Source = source;
-		Destination = destination;
-		App = app;
+		this.sourceNodeID = sourceNodeID;
+		this.destinationNodeID = destinationNodeID;
+		this.app = app;
 		state = State.NEW;
-		Data[0] = tick;
+		Data.put(DataType.STARTTIME, tick);
+		Data.put(DataType.QUEUETIME, 0);
+		Data.put(DataType.SYSTEMTIME, 0);
+		Data.put(DataType.DROPPEDFLAG, 0);
+		
+		currentNodeID = sourceNodeID;
 	}
 	
 	public void tick(int tick){
 		//switch case for counting time depending on the state of the request
 		switch (state) {
 		case NEW:
-			Data[2]++;
+			Data.put(DataType.SYSTEMTIME, Data.get(DataType.SYSTEMTIME)+1);
 			break;
 		case QUEUE:
-			Data[1]++;
-			Data[2]++;
+			Data.put(DataType.QUEUETIME, Data.get(DataType.QUEUETIME)+1);
+			Data.put(DataType.SYSTEMTIME, Data.get(DataType.SYSTEMTIME)+1);
 			break;
 		case INSERVICE:
-			Data[2]++;
+			Data.put(DataType.SYSTEMTIME, Data.get(DataType.SYSTEMTIME)+1);
 			break;
 		case ARRIVED:
 			break;
@@ -53,42 +64,40 @@ public class Request {
 			break;
 		case 3:
 			state = State.ARRIVED;
-			Current = null;
 			break;
 		case 4:
 			state = State.DROPPED;
-			Current = null;
-			Data[3] = 1;
+			Data.put(DataType.DROPPEDFLAG, 1);
 			break;
 		default:
 			//throw new Exception("Invalid request state");
 		}
 	}
 	
-	public void setState(int newState, Node current){
+	public void setState(int newState, int nodeID){
 		//overloaded method for changing state to QUEUE
 		if (newState==1){
 			state = State.QUEUE;
-			Current = current;
+			currentNodeID = nodeID;
 		}else{
 			//throw new Exception("Invalid request state");
 		}
 	}
 
-	public UserNode getSource() {
-		return Source;
+	public int getSourceNodeID() {
+		return sourceNodeID;
 	}
 
-	public UserNode getDestination() {
-		return Destination;
+	public int getDestinationNodeID() {
+		return destinationNodeID;
 	}
 	
 	public int getApp() {
-		return App;
+		return app;
 	}
 
-	public Node getCurrent() {
-		return Current;
+	public int getCurrentNodeID() {
+		return currentNodeID;
 	}
 	//Class not done, we need to implement setters and getters in a way that will allow the class to keep track of its own stats
 }
