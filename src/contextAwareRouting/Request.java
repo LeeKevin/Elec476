@@ -11,6 +11,7 @@ public class Request {
 
 	private int app;
 	private enum State{NEW, QUEUE, INSERVICE, ARRIVED, DROPPED};
+	
 	private State state;
 
 	//Request simulation data, array of int [start time, queue time, system time, dropped]
@@ -22,14 +23,14 @@ public class Request {
 		//setup
 		this.sourceNodeID = sourceNodeID;
 		this.destinationNodeID = destinationNodeID;
-		this.app = app;
+		this.setApp(app);
 		state = State.NEW;
 		Data.put(DataType.STARTTIME, tick);
 		Data.put(DataType.QUEUETIME, 0);
 		Data.put(DataType.SYSTEMTIME, 0);
 		Data.put(DataType.DROPPEDFLAG, 0);
 
-		currentNodeID = sourceNodeID;
+		setCurrentNodeID(sourceNodeID);
 	}
 
 	public void tick(int tick){
@@ -78,29 +79,33 @@ public class Request {
 		//overloaded method for changing state to QUEUE
 		if (newState==1){
 			state = State.QUEUE;
-			currentNodeID = nodeID;
+			setCurrentNodeID(nodeID);
 		}else{
 			//throw new Exception("Invalid request state");
 		}
-	}
-	public void setCurrentNodeID(int currentNodeID){
-		this.currentNodeID = currentNodeID;
 	}
 
 	public int getSourceNodeID() {
 		return sourceNodeID;
 	}
-
+	
 	public int getDestinationNodeID() {
 		return destinationNodeID;
 	}
+	
+	public int getCurrentNodeID() {
+		return currentNodeID;
+	}
 
+	public void setCurrentNodeID(int currentNodeID) {
+		this.currentNodeID = currentNodeID;
+	}
+	
 	public int getApp() {
 		return app;
 	}
 
-	public int getCurrentNodeID() {
-		return currentNodeID;
+	public void setApp(int app) {
+		this.app = app;
 	}
-	//Class not done, we need to implement setters and getters in a way that will allow the class to keep track of its own stats
 }
