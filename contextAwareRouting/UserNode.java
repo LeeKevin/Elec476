@@ -25,36 +25,29 @@ public class UserNode extends Node{
 		this.appList = new ArrayList<Integer>();		
 	}
 
-	public void run() {
-		if (!isWaiting()) {
-			if (isHandlingRequest()) {
-				deployRequest();
-				setHandlingRequest(false);
-			} else {
-				int serviceTime = getServiceTime();
-				if (serviceTime > 0)
-					setServiceTime(serviceTime - 1);
-				else {
-					setServiceTime(0);
-					handleNextRequest();
-					setHandlingRequest(true);
-				}
-			}
-		}
+	@Override
+	protected void handleRequest() {
+		int serviceTime = getServiceTime();
+		if (serviceTime > 0)
+			setServiceTime(serviceTime - 1);
+		else {
+			setServiceTime(0);
+
+			Request nextReq = getNextRequest();
+			if (nextReq.getSourceNodeID() == this.getNodeID())
+				sendToServer();
+			else if(nextReq.getDestinationNodeID() == this.getNodeID())
+				processRequest(nextReq);			
+			setHandlingRequest(true);
+		}		
+	} 	
+
+	private void sendToServer() {
+		Mainline.server.addNodeRequest(this.getNodeID());
+		setWaiting(true);
 	}
 
-	private void handleNextRequest() {
-		Request nextReq = getNextRequest();
-		if (nextReq.getSourceNodeID() == this.getNodeID()) {
-			Mainline.server.addNode(this.getNodeID());
-			setWaiting(true);
-		}
-		else if(nextReq.getDestinationNodeID() == this.getNodeID()) {
-			setServiceTime(processRequest(nextReq));
-		}
-	}
-
-	private int processRequest(Request nextReq) {
+	private void processRequest(Request nextReq) {
 		RandomNumGen generator = new RandomNumGen();
 
 		int reqApp = nextReq.getApp();
@@ -66,7 +59,10 @@ public class UserNode extends Node{
 		}
 		double rate = (minDist == 0) ? 2.0 : 1/(Math.log((double) minDist) + 1.0);
 
-		return (int) (generator.nextExp(rate) * 100); // service time in milliseconds
+		setServiceTime( (int) (generator.nextExp(rate) * 100)); // service time in milliseconds
+
+		// Have to check request to see if first pass or second pass
+
 	}
 
 	public ArrayList<Integer> getAppList(){
@@ -80,6 +76,6 @@ public class UserNode extends Node{
 	public void remove(Integer app){
 		if (appList.contains(app))
 			appList.remove(appList.indexOf(app));
-	} 	
+	}
 
 }

@@ -11,7 +11,7 @@ public class Request {
 
 	private int app;
 	private enum State{NEW, QUEUE, INSERVICE, ARRIVED, DROPPED};
-	
+
 	private State state;
 
 	//Request simulation data, array of int [start time, queue time, system time, dropped]
@@ -88,11 +88,11 @@ public class Request {
 	public int getSourceNodeID() {
 		return sourceNodeID;
 	}
-	
+
 	public int getDestinationNodeID() {
 		return destinationNodeID;
 	}
-	
+
 	public int getCurrentNodeID() {
 		return currentNodeID;
 	}
@@ -100,7 +100,7 @@ public class Request {
 	public void setCurrentNodeID(int currentNodeID) {
 		this.currentNodeID = currentNodeID;
 	}
-	
+
 	public int getApp() {
 		return app;
 	}

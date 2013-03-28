@@ -2,7 +2,7 @@ package contextAwareRouting;
 
 import java.util.LinkedList;
 
-public class Node {
+public abstract class Node {
 	private int nodeID;
 
 	private int xpos;
@@ -19,7 +19,7 @@ public class Node {
 		this.xpos = xpos;
 		this.ypos = ypos;
 		this.queue = new LinkedList<Request>();
-		
+
 		this.setServiceTime(0);
 		this.setWaiting(false);
 		this.setHandlingRequest(false);
@@ -29,6 +29,19 @@ public class Node {
 		this(nodeID,xpos,ypos);
 		this.queue = queue;
 	}
+
+	public void run() {
+		if (!isWaiting()) {
+			if (isHandlingRequest()) {
+				deployRequest();
+				setHandlingRequest(false);
+			} else {
+				handleRequest();
+			}
+		}
+	}
+
+	protected abstract void handleRequest();
 
 	public int getNodeID() {
 		return this.nodeID;
@@ -59,7 +72,7 @@ public class Node {
 		queue.add(request);
 	}
 
-	public Request removeRequest() {
+	protected Request removeRequest() {
 		return queue.remove();
 	}
 
@@ -103,7 +116,7 @@ public class Node {
 		this.handlingRequest = handlingRequest;
 	}
 
-	public void deployRequest() {
+	protected void deployRequest() {
 		Request request = queue.remove();
 		request.setCurrentNodeID(nextNodeID);
 	}
