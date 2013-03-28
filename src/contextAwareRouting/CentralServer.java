@@ -12,6 +12,7 @@ public class CentralServer {
 	private int numUsers;
 	private int numRelays;
 	private int totalNodes;
+	private int CLK; 
 
 
 	public CentralServer(ArrayList<UserNode> userList, ArrayList<RelayNode> relayList){
@@ -50,28 +51,17 @@ public class CentralServer {
 	public void tick(){
 		//the time dependent operation of the server goes here. It should end with the server sending a request on it's way
 
+		// How to handle these requests:
+		//		-Request for user nodes
+		//		-Request for relay nodes
+		
+		
+		
 		//Instantiation of variable handles 
 		Request	current = queue.getFirst(); //this is the next request in line to be serviced
-		int sourceNodeID = current.getCurrentNodeID(); //this is the current node that the current request is at (current.current, null if request is new, arrived, dropped)
-		int destinationNodeID = current.getDestinationNodeID(); //the next node that the request is heading to. to be determined by algorithm (special condition if about to finish journey)
+		//int sourceNodeID = current.getCurrentNodeID(); //this is the current node that the current request is at (current.current, null if request is new, arrived, dropped)
+		//int destinationNodeID = current.getDestinationNodeID(); //the next node that the request is heading to. to be determined by algorithm (special condition if about to finish journey)
 
-
-		//Algorithm goes here
-		//		DijkstrasAlg g = new DijkstrasAlg(adjMat, sourceNodeID, destinationNodeID, adjMat.length);
-		//		int[] path = g.SPA();
-
-		//		destination = masterList[path[path.length - 2]];
-		//		
-		//		//this is how it needs to end in order to interface properly
-		//		//start (user to relay)
-		//		destination.addRequest(current);
-		//		
-		//		//middle (relay to relay)
-		//		source.doneRequest();
-		//		destination.addRequest(current);
-
-		//end (relay to user)
-		//		source.doneRequest();
 		current.setState(3);
 
 	}
