@@ -16,16 +16,28 @@ public class Mainline {
 	public static final int maxtime = 10; //in seconds
 	public static final String [][] appPref = new String[0][0];
 
+	public static final RandomNumGen generator;
+	
 	//System attributes
-	private static ArrayList<UserNode> userList = createUserNodes(numUsers, numApps);
-	private static ArrayList<RelayNode> relayList = createRelayNodes(numRelays);
-	private static ArrayList<Request> requestList = new ArrayList<Request>();
+	private static ArrayList<Request> requestList;
 
-	public static CentralServer server = new CentralServer(userList, relayList);
-	public static final RandomNumGen generator = new RandomNumGen();
+	private static ArrayList<UserNode> userList;
+	private static ArrayList<RelayNode> relayList;
+	
+	public static CentralServer server;
 	public static int time;
+	
+	static {
+		generator = new RandomNumGen();
 
-	public void main(String[] args) {
+		requestList = new ArrayList<Request>();
+
+		userList = createUserNodes(numUsers, numApps);
+		relayList = createRelayNodes(numRelays);
+		server = new CentralServer(userList, relayList);
+	}
+
+	public static void main(String[] args) {
 
 		//Create random arrival times
 		LinkedList<Integer> arrivalTimes = generator.poissonList(requestrate, maxtime); //arrival times are given in milliseconds
@@ -60,7 +72,7 @@ public class Mainline {
 
 	private static ArrayList<UserNode> createUserNodes(int numUsers, int numApps){
 		//variables to work with
-		double x, y = 0;		 
+		double x = 0, y = 0;		 
 		ArrayList<UserNode> userList = new ArrayList<UserNode>(numUsers);
 
 		//for each node
@@ -89,7 +101,7 @@ public class Mainline {
 
 	private static ArrayList<RelayNode> createRelayNodes( int numRelays ){
 		//Variables to work with
-		double x, y = 0;		 
+		double x = 0, y = 0;		 
 		ArrayList<RelayNode> relayList = new ArrayList<RelayNode>(numRelays);
 
 		//for each node
@@ -108,7 +120,7 @@ public class Mainline {
 		return relayList;
 	}
 	
-	public void createRequest(){
+	public static void createRequest(){
 		int sourceNodeID = generator.nextInt(0, numUsers -1);
 		int destinationNodeID;
 
