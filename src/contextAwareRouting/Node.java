@@ -43,6 +43,11 @@ public abstract class Node {
 
 	protected abstract void handleRequest();
 
+	protected void sendToServer() {
+		Mainline.server.addNodeRequest(this.getNodeID());
+		setWaiting(true);
+	}
+	
 	public int getNodeID() {
 		return this.nodeID;
 	}
@@ -68,20 +73,16 @@ public abstract class Node {
 	}
 
 	public void addRequest (Request request) {
-		request.setState(1, nodeID);
+		request.setInQueue(true);
 		queue.add(request);
 	}
 
-	protected Request removeRequest() {
+	private Request removeRequest() {
 		return queue.remove();
 	}
 
 	public int getQueueSize() {
 		return queue.size();
-	}
-
-	public LinkedList<Request> getQueue() {
-		return queue;
 	}
 
 	public int getServiceTime() {
@@ -117,7 +118,7 @@ public abstract class Node {
 	}
 
 	protected void deployRequest() {
-		Request request = queue.remove();
+		Request request = removeRequest();
 		request.setCurrentNodeID(nextNodeID);
 	}
 

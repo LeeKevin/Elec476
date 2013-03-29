@@ -14,9 +14,6 @@ public class CentralServer {
 	private int numRelays;
 	private int totalNodes;
 
-
-	//private static 
-
 	public CentralServer(ArrayList<UserNode> userList, ArrayList<RelayNode> relayList){
 		nodeList.addAll(userList);
 		nodeList.addAll(relayList);
@@ -35,7 +32,7 @@ public class CentralServer {
 				boolean inRange = inRange(nodeList.get(i).getXpos(), nodeList.get(i).getYpos(), nodeList.get(j).getXpos(), nodeList.get(j).getYpos());
 				if(inRange){
 					//Get queue lengths for each element of nodelist
-					int length = nodeList.get(i).getQueue().size();
+					int length = nodeList.get(i).getQueueSize();
 					inContactMatrix[i][j] = length;
 					inContactMatrix[j][i] = length;
 				}
@@ -54,13 +51,9 @@ public class CentralServer {
 	public void handleNodeRequests(){
 		//the time dependent operation of the server goes here. It should end with the server sending a request on it's way
 		for(int i = 0; i < queue.size(); i++){
-			Node node = retrieveNode(queue.remove());
+			Node node = retrieveNode(removeNodeRequest());
 			handleNode(node);
 		}
-	}
-
-	private Node retrieveNode(int NodeID){
-		return nodeList.get(NodeID);
 	}
 
 	private void handleNode(Node node) {
@@ -81,5 +74,9 @@ public class CentralServer {
 
 	private int removeNodeRequest() {
 		return queue.remove();
+	}
+
+	public Node retrieveNode(int NodeID){
+		return nodeList.get(NodeID);
 	}
 }
