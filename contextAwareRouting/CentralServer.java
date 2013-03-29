@@ -40,7 +40,7 @@ public class CentralServer {
 		}
 	}
 
-	private boolean inRange(int x1, int y1, int x2, int y2){
+	private boolean inRange(double x1, double y1, double x2, double y2){
 		double distance = Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2));
 		if (distance <= Mainline.T)
 			return true;

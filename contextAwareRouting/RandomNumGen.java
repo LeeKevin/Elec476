@@ -27,14 +27,13 @@ public class RandomNumGen {
 		return list;
 	}
 	
-	public double genUniformNum(double rightLimit, double leftLimit) {
-		double r = generator.nextDouble();		
-		return r*(rightLimit-leftLimit) + leftLimit;
-	}
-	
-	public double nextDouble(int low, int high) {
+	public double nextDouble(double low, double high) {
 		double r = generator.nextDouble();		
 		return r*(high-low) + low;
+	}
+	
+	public int nextInt(int low, int high) {
+		return (int) Math.round(nextDouble((double) (low) + 0.499, (double) (high) + 0.499 ));
 	}
 	
 	public double nextExp(double rate){

@@ -8,20 +8,20 @@ public class UserNode extends Node{
 	private ArrayList<Integer> appList;
 
 
-	public UserNode(int nodeID, int xpos, int ypos) {
+	public UserNode(int nodeID, double xpos, double ypos) {
 		super(nodeID, xpos, ypos);
 		this.appList = new ArrayList<Integer>();		
 	}
-	public UserNode(int nodeID, int xpos, int ypos, LinkedList<Request> queue) {
+	public UserNode(int nodeID, double xpos, double ypos, LinkedList<Request> queue) {
 		super(nodeID, xpos, ypos, queue);
 		this.appList = new ArrayList<Integer>();		
 	}
-	public UserNode(int nodeID, int xpos, int ypos, ArrayList<Integer> appList) {
+	public UserNode(int nodeID, double xpos, double ypos, ArrayList<Integer> appList) {
 		super(nodeID, xpos, ypos);
 		this.appList = appList;		
 	}
-	public UserNode(int nodeID, int xpos, int ypos, LinkedList<Request> queue, ArrayList<Integer> appList) {
-		super(nodeID, xpos, ypos);
+	public UserNode(int nodeID, double xpos, double ypos, LinkedList<Request> queue, ArrayList<Integer> appList) {
+		super(nodeID, xpos, ypos, queue);
 		this.appList = new ArrayList<Integer>();		
 	}
 
