@@ -5,15 +5,15 @@ import java.util.LinkedList;
 public abstract class Node {
 	private int nodeID;
 
-	private int xpos;
-	private int ypos;
+	private double xpos;
+	private double ypos;
 	private  LinkedList<Request> queue;
 	private int serviceTime;
 	private boolean waiting;
 	private int nextNodeID;
 	private boolean handlingRequest;
 
-	public Node (int nodeID, int xpos, int ypos) {
+	public Node (int nodeID, double xpos, double ypos) {
 		this.nodeID = nodeID;
 
 		this.xpos = xpos;
@@ -25,7 +25,7 @@ public abstract class Node {
 		this.setHandlingRequest(false);
 	}
 
-	public Node (int nodeID, int xpos, int ypos, LinkedList<Request> queue) {
+	public Node (int nodeID, double xpos, double ypos, LinkedList<Request> queue) {
 		this(nodeID,xpos,ypos);
 		this.queue = queue;
 	}
@@ -52,19 +52,19 @@ public abstract class Node {
 		return this.nodeID;
 	}
 
-	public int getXpos() {
+	public double getXpos() {
 		return this.xpos;
 	}
 
-	public void setXpos(int xpos) {
+	public void setXpos(double xpos) {
 		this.xpos = xpos;
 	}
 
-	public int getYpos() {
+	public double getYpos() {
 		return this.ypos;
 	}
 
-	public void setyPos(int ypos) {
+	public void setyPos(double ypos) {
 		this.ypos = ypos;
 	}
 

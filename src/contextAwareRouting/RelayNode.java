@@ -4,11 +4,11 @@ import java.util.LinkedList;
 
 public class RelayNode extends Node{
 
-	public RelayNode(int nodeID, int xpos, int ypos) {
+	public RelayNode(int nodeID, double xpos, double ypos) {
 		super(nodeID, xpos, ypos);
 	}
 
-	public RelayNode(int nodeID, int xpos, int ypos, LinkedList<Request> queue) {
+	public RelayNode(int nodeID, double xpos, double ypos, LinkedList<Request> queue) {
 		super(nodeID, xpos, ypos, queue);
 	}
 

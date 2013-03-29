@@ -39,14 +39,19 @@ public class Mainline {
 				createRequest();
 				arrivalTimes.remove();
 			}
+			
+			
+			for (UserNode node:userList) 
+				node.run();
+			for (RelayNode node:relayList)
+				node.run();
+			
+			server.handleNodeRequests();
 
 			for (Request request: requestList) {
 				if (request.isInQueue())
 					request.incrementTimeInQueue();
 			}
-
-			//Initialize running of network here
-
 			//Graphics generation goes here
 
 			time++;	 
@@ -55,7 +60,7 @@ public class Mainline {
 
 	private static ArrayList<UserNode> createUserNodes(int numUsers, int numApps){
 		//variables to work with
-		int x, y;		 
+		double x, y = 0;		 
 		ArrayList<UserNode> userList = new ArrayList<UserNode>(numUsers);
 
 		//for each node
@@ -63,8 +68,8 @@ public class Mainline {
 
 			//generate random x,y
 			do {
-				x = (int) generator.nextDouble(-R, R);
-				y = (int) generator.nextDouble(-R, R);
+				x = generator.nextDouble(-R, R);
+				y = generator.nextDouble(-R, R);
 			} while (Math.pow(x/R, 2) + Math.pow(y/R, 2) > 1);
 
 			//generates new array for each node
@@ -84,7 +89,7 @@ public class Mainline {
 
 	private static ArrayList<RelayNode> createRelayNodes( int numRelays ){
 		//Variables to work with
-		int x, y;		 
+		double x, y = 0;		 
 		ArrayList<RelayNode> relayList = new ArrayList<RelayNode>(numRelays);
 
 		//for each node
@@ -92,26 +97,26 @@ public class Mainline {
 
 			//generate random x,y
 			do {
-				x = (int) generator.nextDouble(-R, R);
-				y = (int) generator.nextDouble(-R, R);
+				x = generator.nextDouble(-R, R);
+				y = generator.nextDouble(-R, R);
 			} while (Math.pow(x/R, 2) + Math.pow(y/R, 2) > 1);
 
 			//create new relay node and add to the master list
-			relayList.add(new RelayNode(userList.size() + i, x, y));
+			relayList.add(new RelayNode(numUsers + i, x, y));
 		}
 
 		return relayList;
 	}
-
+	
 	public void createRequest(){
-		int sourceNodeID = (int) Math.round(Mainline.generator.nextDouble(0, numUsers -1));
+		int sourceNodeID = generator.nextInt(0, numUsers -1);
 		int destinationNodeID;
 
 		do{ //pick second user that is not the source
-			destinationNodeID = (int) Math.round(Mainline.generator.nextDouble(0, numRelays -1));
+			destinationNodeID = generator.nextInt(0, numRelays -1);
 		} while(sourceNodeID == destinationNodeID);
 
-		Request request = new Request(sourceNodeID, destinationNodeID, (int) Math.round(Mainline.generator.nextDouble(0, Mainline.numApps)), time);
+		Request request = new Request(sourceNodeID, destinationNodeID, generator.nextInt(0, Mainline.numApps), time);
 		requestList.add(request);
 
 		//send the request to source node
