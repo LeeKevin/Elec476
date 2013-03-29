@@ -32,20 +32,25 @@ public class UserNode extends Node{
 			setServiceTime(serviceTime - 1);
 		else {
 			setServiceTime(0);
-
-			Request nextReq = getNextRequest();
-			if (nextReq.getSourceNodeID() == this.getNodeID())
-				sendToServer();
-			else if(nextReq.getDestinationNodeID() == this.getNodeID())
-				processRequest(nextReq);			
-			setHandlingRequest(true);
+			
+			if (getQueueSize() != 0) {
+				Request nextReq = getNextRequest();
+				nextReq.setInQueue(false);
+				if (nextReq.getSourceNodeID() == this.getNodeID()) {
+					if (nextReq.getStatus().equals(Request.Status.OUTGOING)) {
+						setHandlingRequest(true);
+						sendToServer();
+					} else {
+						// Data is retrieved from destination node
+						// Retire request
+						nextReq.calculateTimeInSystem(Mainline.time);
+					}
+				}
+				else if(nextReq.getDestinationNodeID() == this.getNodeID())
+					processRequest(nextReq);			
+			}
 		}		
 	} 	
-
-	private void sendToServer() {
-		Mainline.server.addNodeRequest(this.getNodeID());
-		setWaiting(true);
-	}
 
 	private void processRequest(Request nextReq) {
 		RandomNumGen generator = new RandomNumGen();

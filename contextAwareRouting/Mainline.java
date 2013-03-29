@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class Mainline {
-	//System parameters to play with
+	
+	//System parameters
 	public static final int T = 10;
 	public static final int R = 20;
 	public static final int numUsers = 10;
@@ -15,16 +16,14 @@ public class Mainline {
 	public static final int maxtime = 10; //in seconds
 	public static final String [][] appPref = new String[0][0];
 
-	//The source of all things random:
-	public static final RandomNumGen generator = new RandomNumGen();
-
 	//System attributes
 	private static ArrayList<UserNode> userList = createUserNodes(numUsers, numApps);
 	private static ArrayList<RelayNode> relayList = createRelayNodes(numRelays);
-	public static CentralServer server = new CentralServer(userList, relayList);
-	private static LinkedList<Request> requestList = new LinkedList<Request>();
-	private static int time;
+	private static ArrayList<Request> requestList = new ArrayList<Request>();
 
+	public static CentralServer server = new CentralServer(userList, relayList);
+	public static final RandomNumGen generator = new RandomNumGen();
+	public static int time;
 
 	public void main(String[] args) {
 
@@ -38,20 +37,18 @@ public class Mainline {
 
 			if (time == arrivalTimes.getFirst()) {
 				createRequest();
+				arrivalTimes.remove();
 			}
 
-			//other simulation events will be added here like removal of nodes and dropping of requests
+			for (Request request: requestList) {
+				if (request.isInQueue())
+					request.incrementTimeInQueue();
+			}
 
-			//Progress the system by one tick
-			for (Request Current : requestList)
-				Current.tick(time);
-			for (RelayNode Current : relayList)
-				Current.tick();
-			//			server.tick();
+			//Initialize running of network here
 
-			//graphics generation goes here
+			//Graphics generation goes here
 
-			//tick! 
 			time++;	 
 		}
 	}
@@ -101,28 +98,23 @@ public class Mainline {
 
 			//create new relay node and add to the master list
 			relayList.add(new RelayNode(userList.size() + i, x, y));
-
 		}
 
 		return relayList;
 	}
 
 	public void createRequest(){
-		UserNode source = userList.get((int) Math.round(Mainline.generator.nextDouble(0, numUsers -1)));
-		UserNode destination;
+		int sourceNodeID = (int) Math.round(Mainline.generator.nextDouble(0, numUsers -1));
+		int destinationNodeID;
 
-		//picks second user that is not the source
-		do{
-			destination = userList.get((int) Math.round(Mainline.generator.nextDouble(0, numRelays -1)));
-		} while(source.equals(destination));
+		do{ //pick second user that is not the source
+			destinationNodeID = (int) Math.round(Mainline.generator.nextDouble(0, numRelays -1));
+		} while(sourceNodeID == destinationNodeID);
 
-		//a new request is born
-		Request arrival = new Request(source.getNodeID(), destination.getNodeID(), (int) Math.round(Mainline.generator.nextDouble(0, Mainline.numApps)), time);
+		Request request = new Request(sourceNodeID, destinationNodeID, (int) Math.round(Mainline.generator.nextDouble(0, Mainline.numApps)), time);
+		requestList.add(request);
 
-		//Add request to master list
-		requestList.add(arrival);
-
-		//send the request for processing
-		//		server.addRequest (arrival);
+		//send the request to source node
+		server.retrieveNode(sourceNodeID).addRequest(request);
 	}
 }

@@ -4,8 +4,6 @@ import java.util.LinkedList;
 
 public class RelayNode extends Node{
 
-	private int processing = 0;
-
 	public RelayNode(int nodeID, int xpos, int ypos) {
 		super(nodeID, xpos, ypos);
 	}
@@ -14,30 +12,14 @@ public class RelayNode extends Node{
 		super(nodeID, xpos, ypos, queue);
 	}
 
-	public void tick(){
-		//If processing, count down the ticks until done then send request to server
-		if (processing > 1){
-			processing --;
-		}else if(processing == 1) {
-			processing--;
-			//			Mainline.server.addRequest(super.removeRequest());
-			//If Idle then check if there is anything in the queue and start processing
-		}else if(processing ==-1 && super.getQueueSize()>0){
-			processing = (int) Mainline.generator.nextExp(Mainline.processrate);
-			super.getNextRequest().setState(2);
-		}
-	}
+	@Override
+	protected void handleRequest() {
+		if (getQueueSize() != 0) {
+			Request nextReq = getNextRequest();
+			nextReq.setInQueue(false);
 
-	public void doneRequest(){
-		if (super.getQueueSize()>0){
-			processing = (int) Mainline.generator.nextExp(Mainline.processrate);
-			super.getNextRequest().setState(2);
-		} else {
-			processing = -1;
+			setHandlingRequest(true);
+			sendToServer();
 		}
-	}
-
-	public int getProcessing(){
-		return processing;
 	}
 }
