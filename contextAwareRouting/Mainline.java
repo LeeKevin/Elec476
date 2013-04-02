@@ -1,5 +1,10 @@
 package contextAwareRouting;
 
+import java.awt.Desktop;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -18,7 +23,7 @@ public class Mainline {
 	public static final String [][] appPref = new String[0][0];
 
 	public static final RandomNumGen generator;
-
+	public static String FileName = "statistics.csv";
 
 	//System attributes
 	private static ArrayList<Request> requestList;
@@ -37,15 +42,16 @@ public class Mainline {
 		LinkedList<Integer> arrivalTimes = generator.poissonList(requestrate, maxtime); //arrival times are given in milliseconds
 		server = new CentralServer(createUserNodes(numUsers, numApps), createRelayNodes(numRelays));
 
-		boolean done = false;
+		boolean queuesEmpty = true;
 
 		//statistical values
 		int numRequests = 0;
-		int inQueueTime = 0;
-		int inNetworkTime = 0;
+		double inQueueTime = 0;
+		double inNetworkTime = 0;
 		time = 0;
 		//main simulation time loop
 		do {
+			queuesEmpty = true;
 			if (!arrivalTimes.isEmpty())
 				if (time == arrivalTimes.getFirst()) {
 					createRequest();
@@ -75,9 +81,13 @@ public class Mainline {
 			for(int i = 0; i < numUsers; i++){
 				System.out.print(server.retrieveNode(i).getNodeID() + " : ");
 				if (server.retrieveNode(i).getQueueSize() > 0) {
+					//inQueueTime = inQueueTime + server.retrieveNode(i).getQueueSize();
+					//inNetworkTime = inNetworkTime + server.retrieveNode(i)getInSystemTime()
 					System.out.print("Request in Queue Time = [ ");
 					for(int j = 0; j < server.retrieveNode(i).getQueueSize(); j++ ) {
 						System.out.print(server.retrieveNode(i).getQueue().get(j).getInQueueTime() + " ");
+						//inQueueTime = inQueueTime + server.retrieveNode(i).getQueue().get(j).getInQueueTime();
+						//inNetworkTime = inNetworkTime  + server.retrieveNode(i).getQueue().get(j).getInSystemTime();
 					}
 				} else {
 					System.out.print("No requests");
@@ -88,9 +98,36 @@ public class Mainline {
 
 			//Graphics generation goes here
 
+			for (int i=0; i<numUsers;i++) {
+				if (server.retrieveNode(i).getQueueSize() > 0) {
+					queuesEmpty = false;
+					break;
+				}
+			}
+			if (queuesEmpty)
+				for (int i=0; i<numRelays;i++) {
+					if (server.retrieveNode(i+numUsers).getQueueSize() > 0) {
+						queuesEmpty = false;
+						break;
+					}
+				}
+			if (time > 10 * 100)
+				queuesEmpty = true;
 			time++;	 
 		}
-		while (time < maxtime * 100);
+		while (!arrivalTimes.isEmpty() || !queuesEmpty);
+
+
+		for(int i = 0; i < requestList.size(); i++){
+			inNetworkTime = inNetworkTime + requestList.get(i).getInSystemTime();
+			inQueueTime = inQueueTime + requestList.get(i).getInQueueTime();
+		}
+
+		System.out.println("Total in queue time: " + inQueueTime);
+		System.out.println("Total in system time: " + inNetworkTime);
+		System.out.println("Total requests: " + numRequests);
+		System.out.println("Total Clock Cycles: " + time);
+
 	}
 
 	private static ArrayList<UserNode> createUserNodes(int numUsers, int numApps){
@@ -157,4 +194,84 @@ public class Mainline {
 		//send the request to source node
 		server.retrieveNode(sourceNodeID).addRequest(request);
 	}
+
+	public static void printStats( int node, int time, int clock )
+	{	
+		try{
+			//Open file to right. 
+			String data = " This content will append to the end of the file";
+
+			File file = new File(FileName);
+
+			//if file doesnt exists, then create it
+			if(!file.exists()){
+				file.createNewFile();
+			}
+
+			//true = append file
+			FileWriter fileWritter = new FileWriter(file.getName(),true);
+			BufferedWriter bufferWritter = new BufferedWriter(fileWritter);
+			bufferWritter.write(data);
+			bufferWritter.close();
+
+			System.out.println("Done");
+
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+	}
+
+	public static String OSDectector() {
+
+		String rString = "";
+		String os = System.getProperty("os.name").toLowerCase();
+
+		if( os.contains("wins") == true ){
+			rString =  "windows";
+		}
+		else if( os.contains("nux") == true || os.contains("nix") == true ){
+			rString = "linux";
+		}
+		else if( os.contains("mac") == true ){
+			rString = "mac";
+		}
+
+		return rString;
+
+	}
+
+	public static void openFile(File fileName ){
+
+		String os = OSDectector();
+
+		try
+		{
+			if (os.contains("windows"))
+			{
+				Runtime.getRuntime().exec(new String[]
+						{"rundll32 url.dll,FileProtocolHandler",
+						fileName.getAbsolutePath()});
+				//return true;
+			} 
+			else if (os.contains("linux")){
+				Runtime.getRuntime().exec(new String[]{"/usr/bin/open", fileName.getAbsolutePath()});
+				//return true;
+			} 
+			else{
+				// Unknown OS, try with desktop
+				if (Desktop.isDesktopSupported()){
+					Desktop.getDesktop().open(fileName);
+					//return true;
+				}
+				else{
+					//return false;
+				}
+			}
+		} catch (Exception e){
+			e.printStackTrace(System.err);
+			//No OS!
+		}
+	}
+
+
 }
