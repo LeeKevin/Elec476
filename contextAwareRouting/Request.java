@@ -88,4 +88,16 @@ public class Request {
 	public void calculateTimeInSystem(int exitTime) {
 		Data.put(Statistics.TIME_IN_SYSTEM, exitTime - Data.get(Statistics.START_TIME));
 	}	
+	
+	public int getStartTime() {
+		return Data.get(Statistics.START_TIME);
+	}
+	
+	public int getInQueueTime() {
+		return Data.get(Statistics.TIME_IN_QUEUE);
+	}
+	
+	public int getInSystemTime() {
+		return Data.get(Statistics.TIME_IN_SYSTEM);
+	}
 }
