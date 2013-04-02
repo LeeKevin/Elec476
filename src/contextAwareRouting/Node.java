@@ -121,5 +121,9 @@ public abstract class Node {
 		Request request = removeRequest();
 		request.setCurrentNodeID(nextNodeID);
 	}
+	
+	public LinkedList<Request> getQueue(){
+		return queue;
+	}
 
 }

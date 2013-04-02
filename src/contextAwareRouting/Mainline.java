@@ -3,8 +3,10 @@ package contextAwareRouting;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+//import contextAwareRouting.Request.Statistics;
+
 public class Mainline {
-	
+
 	//System parameters
 	public static final int T = 10;
 	public static final int R = 20;
@@ -17,16 +19,17 @@ public class Mainline {
 	public static final String [][] appPref = new String[0][0];
 
 	public static final RandomNumGen generator;
-	
+
+
 	//System attributes
 	private static ArrayList<Request> requestList;
 
 	private static ArrayList<UserNode> userList;
 	private static ArrayList<RelayNode> relayList;
-	
+
 	public static CentralServer server;
 	public static int time;
-	
+
 	static {
 		generator = new RandomNumGen();
 
@@ -44,26 +47,62 @@ public class Mainline {
 
 		boolean done = false;
 
+		//statistical values
+		int numRequests = 0;
+		int inQueueTime = 0;
+		int inNetworkTime = 0;
+
 		//main simulation time loop
 		for (time = 0; !done; time++) {
-
-			if (time == arrivalTimes.getFirst()) {
-				createRequest();
-				arrivalTimes.remove();
+			if (arrivalTimes.isEmpty()) {
+				done = true;
+				break;
+			} else {
+				if (time == arrivalTimes.getFirst()) {
+					createRequest();
+					numRequests++;
+					arrivalTimes.remove();
+				}
 			}
-			
-			
+
 			for (UserNode node:userList) 
 				node.run();
 			for (RelayNode node:relayList)
 				node.run();
-			
+
 			server.handleNodeRequests();
 
 			for (Request request: requestList) {
 				if (request.isInQueue())
 					request.incrementTimeInQueue();
 			}
+			//Print Stats
+			// Get queue from all nodes
+			// Data.get(Statistics.TIME_IN_QUEUE);
+
+			//USER NODES STATS
+			System.out.println("Statistics for time: " + time );
+
+			System.out.println("At user Nodes:");
+			for(int i = 0; i < numUsers; i++){
+				for(int j = 0; j < userList.get(i).getQueueSize(); j++ ){
+					int tmp = userList.get(j).getQueue().get(j).getInQueueTime();
+					System.out.println("User: " + userList.get(j).getNodeID() + " Resuest " + j + " Current in queue time: " + tmp);
+				}
+			}
+
+			System.out.println("At user Nodes:");
+			for(int i = 0; i < numRelays; i++){
+				for(int j = 0; j < relayList.get(i).getQueueSize(); j++ ){
+					int tmp = relayList.get(j).getQueue().get(j).getInQueueTime();
+					System.out.println("Relay Node: " + userList.get(j).getNodeID() + " Resuest " + j + " Current in queue time: " + tmp);
+				}			
+			}
+
+
+
+			//RELAY NODES
+
 			//Graphics generation goes here
 
 			time++;	 
@@ -119,7 +158,7 @@ public class Mainline {
 
 		return relayList;
 	}
-	
+
 	public static void createRequest(){
 		int sourceNodeID = generator.nextInt(0, numUsers -1);
 		int destinationNodeID;
