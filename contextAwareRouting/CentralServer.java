@@ -63,9 +63,15 @@ public class CentralServer {
 	}
 
 	private int getNextNode(int currentNodeID, int destinationNodeID) {
-		DijkstrasAlg nextNode = new DijkstrasAlg(inContactMatrix, currentNodeID, 
+		DijkstrasAlg alg = new DijkstrasAlg(inContactMatrix, currentNodeID, 
 				destinationNodeID, inContactMatrix.length  );
-		return nextNode.getPath()[nextNode.getPath().length - 2];
+		int[] path = alg.SPA();
+		if (path != null) {
+			int nextNode = path[path.length - 2];
+			return nextNode;
+		} else {
+			return 9999999;
+		}
 	}
 
 	public void addNodeRequest(int nodeId) {

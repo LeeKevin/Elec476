@@ -17,8 +17,6 @@ public class DijkstrasAlg {
 	int[][] weight = new int[MAXNODES][MAXNODES];
 	int[] distance = new int[MAXNODES];
 	int[] precede = new int[MAXNODES];
-	int[] path;
-
 
 	/**
 	 * Find the shortest path across the graph using Dijkstra's algorithm.
@@ -109,20 +107,20 @@ public class DijkstrasAlg {
 		for (int i = 0; i < path.length; i++) {
 			System.out.print(path[i] + ", ");
 		}
-		System.out.print("\n");
+//		System.out.print("\n");
 
-		System.out.print("Cost: ");
+//		System.out.print("Cost: ");
 		int cost = 0;
 		for (int i = 0; i < path.length - 1; i++) {
 
 			cost = cost + weight[path[i]][path[i + 1]];
-			System.out.print("(" + path[i] + ", " + path[i + 1] + ") ");
-			System.out.print(cost + ", ");
+//			System.out.print("(" + path[i] + ", " + path[i + 1] + ") ");
+//			System.out.print(cost + ", ");
 			// System.out.print(distance[i]);
 		}
-		System.out.println("Cost: " + cost);
-
-		System.out.println("For the Total Cost = " + cost);
+//		System.out.println("Cost: " + cost);
+//
+//		System.out.println("For the Total Cost = " + cost);
 
 	}
 
@@ -155,17 +153,8 @@ public class DijkstrasAlg {
 		buildSpanningTree();
 
 		int[] path = getShortestPath();
-		displayResult(path);
-		this.path = path;
+//		displayResult(path);
 
-		return path;
-	}
-	
-	public void setPath(int[] path){
-		this.path = path;
-	}
-	
-	public int[] getPath(){
 		return path;
 	}
 

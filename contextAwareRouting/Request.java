@@ -11,6 +11,7 @@ public class Request {
 	private int app;
 	private boolean inQueue;
 	private boolean dropped;
+	private boolean inProcess;
 	
 	public enum Status{OUTGOING, INCOMING}; //Outgoing - towards destination, Incoming - returning to source
 	private Status status;
@@ -27,6 +28,7 @@ public class Request {
 		
 		this.setInQueue(false);
 		this.setDropped(false);
+		this.setInProcess(false);
 		
 		setStatus(Status.OUTGOING);
 		
@@ -99,5 +101,20 @@ public class Request {
 	
 	public int getInSystemTime() {
 		return Data.get(Statistics.TIME_IN_SYSTEM);
+	}
+
+	public boolean isInProcess() {
+		return inProcess;
+	}
+
+	public void setInProcess(boolean inProcess) {
+		this.inProcess = inProcess;
+	}
+	
+	public void returnRequestToSource () {
+		this.currentNodeID = destinationNodeID;
+		this.destinationNodeID = sourceNodeID;
+		
+		setStatus(Status.INCOMING);
 	}
 }
