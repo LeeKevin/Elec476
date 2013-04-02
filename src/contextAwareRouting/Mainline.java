@@ -8,14 +8,13 @@ import java.util.LinkedList;
 public class Mainline {
 
 	//System parameters
-	public static final int T = 10;
-	public static final int R = 20;
-	public static final int numUsers = 10;
-	public static final int numRelays = 10;
-	public static final int numApps = 3;
-	public static final int requestrate = 1;
-	public static final int processrate = 0; //in arrivals per second
-	public static final int maxtime = 10; //in seconds
+	public static final int T = 15;
+	public static final int R = 5;
+	public static final int numUsers = 3;
+	public static final int numRelays = 3;
+	public static final int numApps = 1; // Must be greater than 0
+	public static final double requestrate = 10;
+	public static final int maxtime = 2; //in seconds
 	public static final String [][] appPref = new String[0][0];
 
 	public static final RandomNumGen generator;
@@ -24,26 +23,19 @@ public class Mainline {
 	//System attributes
 	private static ArrayList<Request> requestList;
 
-	private static ArrayList<UserNode> userList;
-	private static ArrayList<RelayNode> relayList;
-
 	public static CentralServer server;
 	public static int time;
 
 	static {
 		generator = new RandomNumGen();
-
 		requestList = new ArrayList<Request>();
-
-		userList = createUserNodes(numUsers, numApps);
-		relayList = createRelayNodes(numRelays);
-		server = new CentralServer(userList, relayList);
 	}
 
 	public static void main(String[] args) {
 
 		//Create random arrival times
 		LinkedList<Integer> arrivalTimes = generator.poissonList(requestrate, maxtime); //arrival times are given in milliseconds
+		server = new CentralServer(createUserNodes(numUsers, numApps), createRelayNodes(numRelays));
 
 		boolean done = false;
 
@@ -51,24 +43,20 @@ public class Mainline {
 		int numRequests = 0;
 		int inQueueTime = 0;
 		int inNetworkTime = 0;
-
+		time = 0;
 		//main simulation time loop
-		for (time = 0; !done; time++) {
-			if (arrivalTimes.isEmpty()) {
-				done = true;
-				break;
-			} else {
+		do {
+			if (!arrivalTimes.isEmpty())
 				if (time == arrivalTimes.getFirst()) {
 					createRequest();
 					numRequests++;
 					arrivalTimes.remove();
 				}
-			}
 
-			for (UserNode node:userList) 
-				node.run();
-			for (RelayNode node:relayList)
-				node.run();
+			for (int i=0; i<numUsers; i++)
+				server.retrieveNode(i).run();
+			for (int i=0; i<numRelays; i++)
+				server.retrieveNode(i + numUsers);
 
 			server.handleNodeRequests();
 
@@ -81,32 +69,28 @@ public class Mainline {
 			// Data.get(Statistics.TIME_IN_QUEUE);
 
 			//USER NODES STATS
-			System.out.println("Statistics for time: " + time );
+			System.out.println("Statistics for time: " + (double) time/100 );
 
-			System.out.println("At user Nodes:");
+			System.out.println("At User Node:");
 			for(int i = 0; i < numUsers; i++){
-				for(int j = 0; j < userList.get(i).getQueueSize(); j++ ){
-					int tmp = userList.get(j).getQueue().get(j).getInQueueTime();
-					System.out.println("User: " + userList.get(j).getNodeID() + " Resuest " + j + " Current in queue time: " + tmp);
+				System.out.print(server.retrieveNode(i).getNodeID() + " : ");
+				if (server.retrieveNode(i).getQueueSize() > 0) {
+					System.out.print("Request in Queue Time = [ ");
+					for(int j = 0; j < server.retrieveNode(i).getQueueSize(); j++ ) {
+						System.out.print(server.retrieveNode(i).getQueue().get(j).getInQueueTime() + " ");
+					}
+				} else {
+					System.out.print("No requests");
 				}
+				System.out.println();
 			}
-
-			System.out.println("At user Nodes:");
-			for(int i = 0; i < numRelays; i++){
-				for(int j = 0; j < relayList.get(i).getQueueSize(); j++ ){
-					int tmp = relayList.get(j).getQueue().get(j).getInQueueTime();
-					System.out.println("Relay Node: " + userList.get(j).getNodeID() + " Resuest " + j + " Current in queue time: " + tmp);
-				}			
-			}
-
-
-
 			//RELAY NODES
 
 			//Graphics generation goes here
 
 			time++;	 
 		}
+		while (time < maxtime * 100);
 	}
 
 	private static ArrayList<UserNode> createUserNodes(int numUsers, int numApps){
@@ -128,7 +112,7 @@ public class Mainline {
 
 			//fills it randomly
 			for (int j = 0; j<numApps; j++){
-				appList.add(generator.nextInt());
+				appList.add(generator.nextInt(1, numApps));
 			}
 
 			//create new user node and add to the master list

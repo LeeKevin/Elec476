@@ -77,7 +77,7 @@ public abstract class Node {
 		queue.add(request);
 	}
 
-	private Request removeRequest() {
+	protected Request removeRequest() {
 		return queue.remove();
 	}
 
@@ -119,7 +119,9 @@ public abstract class Node {
 
 	protected void deployRequest() {
 		Request request = removeRequest();
-		request.setCurrentNodeID(nextNodeID);
+		if (nextNodeID != 9999999)
+			request.setCurrentNodeID(nextNodeID);
+		Mainline.server.retrieveNode(nextNodeID).addRequest(request);
 	}
 	
 	public LinkedList<Request> getQueue(){

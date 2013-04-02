@@ -35,6 +35,12 @@ public class UserNode extends Node{
 			
 			if (getQueueSize() != 0) {
 				Request nextReq = getNextRequest();
+				if (nextReq.isInProcess()) {
+					nextReq.returnRequestToSource();
+					setHandlingRequest(true);
+					nextReq.setInProcess(false);
+					sendToServer();
+				}
 				nextReq.setInQueue(false);
 				if (nextReq.getSourceNodeID() == this.getNodeID()) {
 					if (nextReq.getStatus().equals(Request.Status.OUTGOING)) {
@@ -44,9 +50,10 @@ public class UserNode extends Node{
 						// Data is retrieved from destination node
 						// Retire request
 						nextReq.calculateTimeInSystem(Mainline.time);
+						removeRequest();
 					}
 				}
-				else if(nextReq.getDestinationNodeID() == this.getNodeID())
+				else if(nextReq.getDestinationNodeID() == this.getNodeID() && nextReq.getStatus().equals(Request.Status.OUTGOING))
 					processRequest(nextReq);			
 			}
 		}		
@@ -66,8 +73,7 @@ public class UserNode extends Node{
 
 		setServiceTime( (int) (generator.nextExp(rate) * 100)); // service time in milliseconds
 
-		// Have to check request to see if first pass or second pass
-
+		nextReq.setInProcess(true);
 	}
 
 	public ArrayList<Integer> getAppList(){
