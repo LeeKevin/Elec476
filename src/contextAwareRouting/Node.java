@@ -44,7 +44,7 @@ public abstract class Node {
 			} else {
 				handleRequest();
 			}
-		}
+		}		
 	}
 
 	protected abstract void handleRequest();
@@ -79,13 +79,16 @@ public abstract class Node {
 		return this.xpos;
 	}
 
+	public void setXpos(double xpos) {
+		this.xpos = xpos;
+	}
+	
 	public double getYpos() {
 		return this.ypos;
 	}
 	
-	public void updateLocation(double XrandPos, double YrandPos){
-		xpos = this.getXpos() + XrandPos;
-		ypos= this.getYpos() + YrandPos;
+	public void setYpos(double ypos) {
+		this.ypos = ypos;
 	}
 
 	public Request getNextRequest() {
