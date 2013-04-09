@@ -14,15 +14,11 @@ public class Mainline {
 
 	//System parameters
 	public static final int T = 15;
-<<<<<<< .mine
+
 	public static final int R = 10;
 	public static final int numUsers = 40;
 	public static final int numRelays = 40;
-=======
-	public static final int R = 5;
-	public static final int numUsers = 5;
-	public static final int numRelays = 10;
->>>>>>> .r41
+
 	public static final int numApps = 1; // Must be greater than 0
 	public static final double requestrate = 10;
 	public static final int maxtime = 2; //in seconds
