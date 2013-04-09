@@ -41,5 +41,10 @@ public class UserNode extends Node{
 			}
 		}		
 	} 	
+	
+	public void updateLocation(double XrandPos, double YrandPos){
+		setXpos(this.getXpos() + XrandPos);
+		setYpos(this.getYpos() + YrandPos);
+	}
 
 }
