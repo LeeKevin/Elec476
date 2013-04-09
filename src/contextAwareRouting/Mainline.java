@@ -39,11 +39,17 @@ public class Mainline {
 	}
 
 	public static void main(String[] args) {
+		boolean end = false;
 
 		//Create random arrival times
 		LinkedList<Integer> arrivalTimes = generator.poissonList(requestrate, maxtime); //arrival times are given in milliseconds
 		server = new CentralServer(createUserNodes(numUsers, numApps), createRelayNodes(numRelays));
 
+		System.out.println("Request times:");
+		for (int xtime: arrivalTimes){
+			System.out.print(xtime + ", ");
+		}
+		
 		boolean queuesEmpty = true;
 
 		//statistical values
@@ -61,10 +67,8 @@ public class Mainline {
 					arrivalTimes.remove();
 				}
 
-			for (int i=0; i<numUsers; i++)
+			for (int i=0; i< (numUsers+numRelays); i++)
 				server.retrieveNode(i).run();
-			for (int i=0; i<numRelays; i++)
-				server.retrieveNode(i + numUsers);
 
 			server.handleNodeRequests();
 
@@ -72,31 +76,14 @@ public class Mainline {
 				if (request.isInQueue())
 					request.incrementTimeInQueue();
 			}
-			//Print Stats
-			// Get queue from all nodes
-			// Data.get(Statistics.TIME_IN_QUEUE);
 
-			//USER NODES STATS
+			//DEBUG
+			//Prints the position of all requests 
 			System.out.println("Statistics for time: " + (double) time/100 );
 
-			System.out.println("At User Node:");
-			for(int i = 0; i < numUsers; i++){
-				System.out.print(server.retrieveNode(i).getNodeID() + " : ");
-				if (server.retrieveNode(i).getQueueSize() > 0) {
-					//inQueueTime = inQueueTime + server.retrieveNode(i).getQueueSize();
-					//inNetworkTime = inNetworkTime + server.retrieveNode(i)getInSystemTime()
-					System.out.print("Request in Queue Time = [ ");
-					for(int j = 0; j < server.retrieveNode(i).getQueueSize(); j++ ) {
-						System.out.print(server.retrieveNode(i).getQueue().get(j).getInQueueTime() + " ");
-						//inQueueTime = inQueueTime + server.retrieveNode(i).getQueue().get(j).getInQueueTime();
-						//inNetworkTime = inNetworkTime  + server.retrieveNode(i).getQueue().get(j).getInSystemTime();
-					}
-				} else {
-					System.out.print("No requests");
-				}
-				System.out.println();
+			for(Request x : requestList){
+				System.out.println(x.getCurrentNodeID());
 			}
-			//RELAY NODES
 
 			//Graphics generation goes here
 
@@ -106,18 +93,23 @@ public class Mainline {
 					break;
 				}
 			}
-			if (queuesEmpty)
+			
+			if (queuesEmpty){
 				for (int i=0; i<numRelays;i++) {
 					if (server.retrieveNode(i+numUsers).getQueueSize() > 0) {
 						queuesEmpty = false;
 						break;
 					}
 				}
-			if (time > 10 * 100)
-				queuesEmpty = true;
-			time++;	 
-		}
-		while (!arrivalTimes.isEmpty() || !queuesEmpty);
+			}
+			
+			if (time > (10 * 100)){
+				end = true;
+			}
+			
+			time++;	
+			
+		}while (!end && !(arrivalTimes.isEmpty() && queuesEmpty));
 
 
 		for(int i = 0; i < requestList.size(); i++){
@@ -197,7 +189,7 @@ public class Mainline {
 		server.retrieveNode(sourceNodeID).addRequest(request);
 	}
 
-	public static void printStats( int node, int time, int clock )
+	public static void printStats( int node, int ftime, int clock )
 	{	
 		try{
 			//Open file to right. 

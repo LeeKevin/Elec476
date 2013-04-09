@@ -142,8 +142,9 @@ public abstract class Node {
 
 	protected void deployRequest() {
 		Request request = removeRequest();
-		if (nextNodeID != 9999999)
+		if (nextNodeID != 9999999) {
 			request.setCurrentNodeID(nextNodeID);
+		}
 		Mainline.server.retrieveNode(nextNodeID).addRequest(request);
 	}
 	
