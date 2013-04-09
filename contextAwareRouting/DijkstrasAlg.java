@@ -6,17 +6,17 @@ import java.io.InputStreamReader;
 
 public class DijkstrasAlg {
 
-	private static final int MAXNODES = 50;
 	private static final int INFINITY = Integer.MAX_VALUE;
 	
 	private int source;
 	private int destination;
 	private int[][] adjWeight;
 	int n;
+	
 	// int cost;
-	int[][] weight = new int[MAXNODES][MAXNODES];
-	int[] distance = new int[MAXNODES];
-	int[] precede = new int[MAXNODES];
+	int[][] weight;
+	int[] distance;
+	int[] precede;
 
 	/**
 	 * Find the shortest path across the graph using Dijkstra's algorithm.
@@ -27,11 +27,15 @@ public class DijkstrasAlg {
 		this.source = source;
 		this.destination = destination;
 		this.n = num;
+		
+		weight = new int[n][n];
+		distance = new int[n];
+		precede = new int[n];
 	}
 	
 	void buildSpanningTree() {
 
-		boolean[] visit = new boolean[MAXNODES];
+		boolean[] visit = new boolean[n];
 
 		for (int i = 0; i < n; i++) {
 			distance[i] = INFINITY;
@@ -76,7 +80,7 @@ public class DijkstrasAlg {
 
 		int i = destination;
 		int finall = 0;
-		int[] path = new int[MAXNODES];
+		int[] path = new int[n];
 
 		path[finall] = destination;
 		finall++;

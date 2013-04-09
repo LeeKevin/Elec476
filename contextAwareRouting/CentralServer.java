@@ -30,16 +30,19 @@ public class CentralServer {
 		for (int i=0; i<totalNodes; i++){
 			for (int j=i+1; j<totalNodes; j++){
 				boolean inRange = inRange(nodeList.get(i).getXpos(), nodeList.get(i).getYpos(), nodeList.get(j).getXpos(), nodeList.get(j).getYpos());
-				if(inRange){
-					//Get queue lengths for each element of nodelist
-					int length = nodeList.get(i).getQueueSize();
-					inContactMatrix[i][j] = length;
-					inContactMatrix[j][i] = length;
+				if(i == j){
+					inContactMatrix[i][j] = Integer.MAX_VALUE;
+					inContactMatrix[j][i] = Integer.MAX_VALUE;
+				}
+				else if(inRange){
+					inContactMatrix[i][j] = nodeList.get(j).getQueueSize();
+					inContactMatrix[j][i] = nodeList.get(i).getQueueSize();
 				}
 			}
 		}
 	}
 
+	//check to see if nodes can communicate
 	private boolean inRange(double x1, double y1, double x2, double y2){
 		double distance = Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2));
 		if (distance <= Mainline.T)
@@ -57,14 +60,15 @@ public class CentralServer {
 	}
 
 	private void handleNode(Node node) {
-		int nextNodeID = getNextNode(node.getNextRequest().getCurrentNodeID(),node.getNextRequest().getDestinationNodeID());
-		node.setNextNodeID(nextNodeID);
+		node.setNextNodeID(getNextNode(node.getNextRequest().getCurrentNodeID(),node.getNextRequest().getDestinationNodeID()));
 		node.setWaiting(false);
 	}
 
 	private int getNextNode(int currentNodeID, int destinationNodeID) {
-		DijkstrasAlg alg = new DijkstrasAlg(inContactMatrix, currentNodeID, 
-				destinationNodeID, inContactMatrix.length  );
+		DijkstrasAlg alg = new DijkstrasAlg(inContactMatrix, 
+											currentNodeID, 
+											destinationNodeID, 
+											inContactMatrix.length);
 		int[] path = alg.SPA();
 		if (path != null) {
 			int nextNode = path[path.length - 2];
