@@ -1,5 +1,6 @@
 package contextAwareRouting;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public abstract class Node {
@@ -7,11 +8,14 @@ public abstract class Node {
 
 	private double xpos;
 	private double ypos;
-	private  LinkedList<Request> queue;
 	private int serviceTime;
 	private boolean waiting;
 	private int nextNodeID;
 	private boolean handlingRequest;
+	
+	private ArrayList<Integer> appList;
+	
+	private  LinkedList<Request> queue;
 
 	public Node (int nodeID, double xpos, double ypos) {
 		this.nodeID = nodeID;
@@ -25,10 +29,12 @@ public abstract class Node {
 		this.setHandlingRequest(false);
 	}
 
-	public Node (int nodeID, double xpos, double ypos, LinkedList<Request> queue) {
+	public Node (int nodeID, double xpos, double ypos, ArrayList<Integer> appList) {
 		this(nodeID,xpos,ypos);
-		this.queue = queue;
+		this.appList = appList;
 	}
+	
+	
 
 	public void run() {
 		if (!isWaiting()) {
@@ -48,6 +54,23 @@ public abstract class Node {
 		setWaiting(true);
 	}
 	
+	protected void processRequest(Request nextReq) {
+		RandomNumGen generator = new RandomNumGen();
+
+		int reqApp = nextReq.getApp();
+		int minDist = Mainline.numApps;
+		for (Integer app:appList) {
+			int dist = Math.max(0, Math.min(Math.abs(reqApp - app), Math.min(reqApp, app) + Mainline.numApps - Math.max(reqApp, app)));
+			if (dist < minDist)
+				minDist = dist;
+		}
+		double rate = (minDist == 0) ? 2.0 : 1/(0.5 * Math.log((double) minDist) + 1.0);
+
+		setServiceTime( (int) (generator.nextExp(rate) * 100)); // service time in milliseconds
+
+		nextReq.setInProcess(true);
+	}
+	
 	public int getNodeID() {
 		return this.nodeID;
 	}
@@ -56,16 +79,13 @@ public abstract class Node {
 		return this.xpos;
 	}
 
-	public void setXpos(double xpos) {
-		this.xpos = xpos;
-	}
-
 	public double getYpos() {
 		return this.ypos;
 	}
-
-	public void setyPos(double ypos) {
-		this.ypos = ypos;
+	
+	public void updateLocation(double XrandPos, double YrandPos){
+		xpos = this.getXpos() + XrandPos;
+		ypos= this.getYpos() + YrandPos;
 	}
 
 	public Request getNextRequest() {
@@ -126,6 +146,19 @@ public abstract class Node {
 	
 	public LinkedList<Request> getQueue(){
 		return queue;
+	}
+
+	public ArrayList<Integer> getAppList(){
+		return appList;
+	} 	
+
+	public void addApp(Integer app){
+		appList.add(app);
+	} 	
+
+	public void remove(Integer app){
+		if (appList.contains(app))
+			appList.remove(appList.indexOf(app));
 	}
 
 }
