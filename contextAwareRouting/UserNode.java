@@ -88,5 +88,10 @@ public class UserNode extends Node{
 		if (appList.contains(app))
 			appList.remove(appList.indexOf(app));
 	}
+	
+	public void updateLocation(double XrandPos, double YrandPos){
+		this.setXpos(this.getXpos() + XrandPos);
+		this.setyPos(this.getYpos() + YrandPos);
+	}
 
 }
