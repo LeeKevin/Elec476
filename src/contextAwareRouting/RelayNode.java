@@ -1,6 +1,6 @@
 package contextAwareRouting;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 public class RelayNode extends Node{
 
@@ -8,18 +8,28 @@ public class RelayNode extends Node{
 		super(nodeID, xpos, ypos);
 	}
 
-	public RelayNode(int nodeID, double xpos, double ypos, LinkedList<Request> queue) {
-		super(nodeID, xpos, ypos, queue);
+	public RelayNode(int nodeID, double xpos, double ypos, ArrayList<Integer> appList) {
+		super(nodeID, xpos, ypos, appList);
 	}
 
 	@Override
-	protected void handleRequest() {
+	protected void serviceNextRequest() {
 		if (getQueueSize() != 0) {
-			Request nextReq = getNextRequest();
+			//Pull next request from queue
+			Request nextReq = removeRequest();
+			setReqInService(nextReq);
 			nextReq.setInQueue(false);
+			setSentToServer(false);
 
-			setHandlingRequest(true);
+			calculateServiceTime(nextReq);
+		}		
+	}
+
+	@Override
+	protected void handleRequestAfterProcessing(Request request) {
+		if (isSentToServer())
+			deployRequest();
+		else
 			sendToServer();
-		}
 	}
 }

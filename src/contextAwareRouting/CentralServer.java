@@ -57,7 +57,8 @@ public class CentralServer {
 	}
 
 	private void handleNode(Node node) {
-		int nextNodeID = getNextNode(node.getNextRequest().getCurrentNodeID(),node.getNextRequest().getDestinationNodeID());
+		Request request = node.getReqInService();
+		int nextNodeID = getNextNode(request.getCurrentNodeID(),request.getDestinationNodeID());
 		node.setNextNodeID(nextNodeID);
 		node.setWaiting(false);
 	}

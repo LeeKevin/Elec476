@@ -3,7 +3,8 @@ package contextAwareRouting;
 import java.util.EnumMap;
 
 public class Request {
-
+	private int requestID;
+	
 	//Request description attributes
 	private int sourceNodeID;
 	private int destinationNodeID;
@@ -11,7 +12,6 @@ public class Request {
 	private int app;
 	private boolean inQueue;
 	private boolean dropped;
-	private boolean inProcess;
 	
 	public enum Status{OUTGOING, INCOMING}; //Outgoing - towards destination, Incoming - returning to source
 	private Status status;
@@ -19,20 +19,21 @@ public class Request {
 	private enum Statistics{START_TIME, TIME_IN_QUEUE, TIME_IN_SYSTEM}; //Request simulation statistics
 	private EnumMap<Statistics,Integer> Data = new EnumMap<Statistics,Integer>(Statistics.class);
 	
-	public Request(int sourceNodeID, int destinationNodeID, int app, int tick){
+	public Request(int sourceNodeID, int destinationNodeID, int app, int reqID){
 		//setup
 		this.sourceNodeID = sourceNodeID;
 		this.destinationNodeID = destinationNodeID;
 		
 		this.app = app;
 		
+		this.requestID = reqID;
+		
 		this.setInQueue(false);
 		this.setDropped(false);
-		this.setInProcess(false);
 		
 		setStatus(Status.OUTGOING);
 		
-		Data.put(Statistics.START_TIME, tick);
+		Data.put(Statistics.START_TIME, Mainline.time);
 		Data.put(Statistics.TIME_IN_QUEUE, 0);
 		Data.put(Statistics.TIME_IN_SYSTEM, 0);
 
@@ -102,19 +103,15 @@ public class Request {
 	public int getInSystemTime() {
 		return Data.get(Statistics.TIME_IN_SYSTEM);
 	}
-
-	public boolean isInProcess() {
-		return inProcess;
-	}
-
-	public void setInProcess(boolean inProcess) {
-		this.inProcess = inProcess;
-	}
 	
 	public void returnRequestToSource () {
 		this.currentNodeID = destinationNodeID;
 		this.destinationNodeID = sourceNodeID;
 		
 		setStatus(Status.INCOMING);
+	}
+	
+	public int getRequestID() {
+		return requestID;
 	}
 }

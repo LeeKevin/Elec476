@@ -14,13 +14,17 @@ public class Mainline {
 
 	//System parameters
 	public static final int T = 15;
-	public static final int R = 5;
+
+	public static final int R = 10;
 	public static final int numUsers = 5;
-	public static final int numRelays = 10;
+	public static final int numRelays = 5;
+
 	public static final int numApps = 1; // Must be greater than 0
 	public static final double requestrate = 10;
 	public static final int maxtime = 2; //in seconds
 	public static final String [][] appPref = new String[0][0];
+	
+	public static int reqCount = 0;
 
 	public static final RandomNumGen generator;
 	public static String FileName = "statistics.csv";
@@ -59,11 +63,8 @@ public class Mainline {
 					arrivalTimes.remove();
 				}
 
-			for (int i=0; i<numUsers; i++)
+			for (int i=0; i<numUsers + numRelays; i++)
 				server.retrieveNode(i).run();
-			for (int i=0; i<numRelays; i++)
-				server.retrieveNode(i + numUsers);
-
 			server.handleNodeRequests();
 
 			for (Request request: requestList) {
@@ -83,9 +84,9 @@ public class Mainline {
 				if (server.retrieveNode(i).getQueueSize() > 0) {
 					//inQueueTime = inQueueTime + server.retrieveNode(i).getQueueSize();
 					//inNetworkTime = inNetworkTime + server.retrieveNode(i)getInSystemTime()
-					System.out.print("Request in Queue Time = [ ");
+					System.out.print("Request Queue = [ ");
 					for(int j = 0; j < server.retrieveNode(i).getQueueSize(); j++ ) {
-						System.out.print(server.retrieveNode(i).getQueue().get(j).getInQueueTime() + " ");
+						System.out.print(server.retrieveNode(i).getQueue().get(j).getRequestID() + " ");
 						//inQueueTime = inQueueTime + server.retrieveNode(i).getQueue().get(j).getInQueueTime();
 						//inNetworkTime = inNetworkTime  + server.retrieveNode(i).getQueue().get(j).getInSystemTime();
 					}
@@ -188,8 +189,9 @@ public class Mainline {
 			destinationNodeID = generator.nextInt(0, numRelays -1);
 		} while(sourceNodeID == destinationNodeID);
 
-		Request request = new Request(sourceNodeID, destinationNodeID, generator.nextInt(0, Mainline.numApps), time);
+		Request request = new Request(sourceNodeID, destinationNodeID, generator.nextInt(0, Mainline.numApps), reqCount);
 		requestList.add(request);
+		reqCount++;
 
 		//send the request to source node
 		server.retrieveNode(sourceNodeID).addRequest(request);
