@@ -2,6 +2,8 @@ package contextAwareRouting;
 
 import java.util.ArrayList;
 
+import contextAwareRouting.Request.Status;
+
 public class UserNode extends Node{
 
 	public UserNode(int nodeID, double xpos, double ypos, ArrayList<Integer> appList) {
@@ -9,39 +11,41 @@ public class UserNode extends Node{
 	}
 
 	@Override
-	protected void handleRequest() {
-		int serviceTime = getServiceTime();
-		if (serviceTime > 0)
-			setServiceTime(serviceTime - 1);
-		else {
-			setServiceTime(0);
-			
-			if (getQueueSize() != 0) {
-				Request nextReq = getNextRequest();
-				if (nextReq.isInProcess()) {
-					nextReq.returnRequestToSource();
-					setHandlingRequest(true);
-					nextReq.setInProcess(false);
-					sendToServer();
-				}
-				nextReq.setInQueue(false);
-				if (nextReq.getSourceNodeID() == this.getNodeID()) {
-					if (nextReq.getStatus().equals(Request.Status.OUTGOING)) {
-						setHandlingRequest(true);
-						sendToServer();
-					} else {
-						// Data is retrieved from destination node
-						// Retire request
-						nextReq.calculateTimeInSystem(Mainline.time);
-						removeRequest();
-					}
-				}
-				else if(nextReq.getDestinationNodeID() == this.getNodeID() && nextReq.getStatus().equals(Request.Status.OUTGOING))
-					processRequest(nextReq);			
+	protected void serviceNextRequest() {
+		//Pull next request from queue
+		reqInService = removeRequest();
+		reqInService.setInQueue(false);
+		
+		//start/end condition
+		if (reqInService.getSourceNodeID() == this.getNodeID()) {
+			//If request is leaving
+			serviceTime = 0;
+			//If request has returned
+			if (reqInService.getStatus().equals(Request.Status.INCOMING)) {
+				// Retire request, if incoming
+				reqInService.calculateTimeInSystem(Mainline.time);
+				reqInService.setStatus(Status.ARRIVED);
+				setReqInService(null);
+			} else {
+				sendToServer();
 			}
-		}		
-	} 	
-	
+		}
+		
+		//else has to be middle condition
+		else if(reqInService.getDestinationNodeID() == this.getNodeID() && reqInService.getStatus().equals(Request.Status.OUTGOING)){
+			reqInService.returnRequestToSource();
+			calculateServiceTime(reqInService);
+			sendToServer();
+		}
+		
+		else {
+			serviceTime = 0;
+			reqInService.calculateTimeInSystem(Mainline.time);
+			reqInService.setStatus(Status.DROPPED);
+			setReqInService(null);
+		}
+	}
+
 	public void updateLocation(double XrandPos, double YrandPos){
 		setXpos(this.getXpos() + XrandPos);
 		setYpos(this.getYpos() + YrandPos);

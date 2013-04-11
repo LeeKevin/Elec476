@@ -5,10 +5,10 @@ import java.util.LinkedList;
 
 public class CentralServer {
 
-	private ArrayList<Node> nodeList = new ArrayList<Node>(); //master user list
-	private LinkedList<Integer> queue = new LinkedList<Integer>(); //holds nodeID requests to be handled 
-	// NodeID is position in nodelist;
-	private int[][] inContactMatrix; //Adjacency Matrix
+	private ArrayList<Node> nodeList = new ArrayList<Node>(); 		//master user list
+	private LinkedList<Integer> queue = new LinkedList<Integer>(); 	//holds nodeID requests to be handled 
+																	// NodeID is position in nodelist;
+	private float[][] inContactMatrix; //Adjacency Matrix
 
 	private int numUsers;
 	private int numRelays;
@@ -26,17 +26,15 @@ public class CentralServer {
 	}
 
 	public void updateInContactMatrix(){
-		inContactMatrix = new int [totalNodes][totalNodes];
+		inContactMatrix = new float [totalNodes][totalNodes];
 		for (int i=0; i<totalNodes; i++){
-			for (int j=i+1; j<totalNodes; j++){
-				boolean inRange = inRange(nodeList.get(i).getXpos(), nodeList.get(i).getYpos(), nodeList.get(j).getXpos(), nodeList.get(j).getYpos());
-				if(i == j){
-					inContactMatrix[i][j] = Integer.MAX_VALUE;
-					inContactMatrix[j][i] = Integer.MAX_VALUE;
-				}
-				else if(inRange){
-					inContactMatrix[i][j] = nodeList.get(j).getQueueSize();
-					inContactMatrix[j][i] = nodeList.get(i).getQueueSize();
+			for (int j=i; j<totalNodes; j++){
+				if((i!=j) && inRange(nodeList.get(i).getXpos(), nodeList.get(i).getYpos(), nodeList.get(j).getXpos(), nodeList.get(j).getYpos())){
+					inContactMatrix[i][j] = nodeList.get(j).getQueueSize() + 1;
+					inContactMatrix[j][i] = nodeList.get(i).getQueueSize() + 1;
+				} else {
+					inContactMatrix[i][j] = Float.POSITIVE_INFINITY;
+					inContactMatrix[j][i] = Float.POSITIVE_INFINITY;
 				}
 			}
 		}
@@ -52,7 +50,9 @@ public class CentralServer {
 	}
 
 	public void handleNodeRequests(){
-		//the time dependent operation of the server goes here. It should end with the server sending a request on it's way
+		//update the system matrix
+		updateInContactMatrix();
+		//cycle through every node that asked for a next path and handle it
 		for(int i = 0; i < queue.size(); i++){
 			Node node = retrieveNode(removeNodeRequest());
 			handleNode(node);
@@ -60,22 +60,13 @@ public class CentralServer {
 	}
 
 	private void handleNode(Node node) {
-		node.setNextNodeID(getNextNode(node.getNextRequest().getCurrentNodeID(),node.getNextRequest().getDestinationNodeID()));
-		node.setWaiting(false);
+		//Give node a next destination and notify it that it can proceed
+		node.setNextNodeID(getNextNode(node.getNodeID(), node.getReqInService().getDestinationNodeID()));
 	}
 
 	private int getNextNode(int currentNodeID, int destinationNodeID) {
-		DijkstrasAlg alg = new DijkstrasAlg(inContactMatrix, 
-											currentNodeID, 
-											destinationNodeID, 
-											inContactMatrix.length);
-		int[] path = alg.SPA();
-		if (path != null) {
-			int nextNode = path[path.length - 2];
-			return nextNode;
-		} else {
-			return 9999999;
-		}
+		//todo: switchcase for all our methods
+		return DickAlg(currentNodeID, destinationNodeID);
 	}
 
 	public void addNodeRequest(int nodeId) {
@@ -88,5 +79,75 @@ public class CentralServer {
 
 	public Node retrieveNode(int NodeID){
 		return nodeList.get(NodeID);
+	}
+	
+	private int DickAlg(int source, int destination){
+		//define infinity as the max value of an int
+		final float INFINITY = Float.POSITIVE_INFINITY;
+		
+		//local variables to play with
+		float[] distance = new float[totalNodes];
+		int[] precede= new int[totalNodes];
+		int current;
+		float testDist;
+		int answer = destination;
+		boolean success = false;
+		
+		//Create a list of all the viable nodes (source, destination and all relays)
+		ArrayList<Integer> Q = new ArrayList<Integer>();
+		Q.add(source);
+		Q.add(destination);
+		for (int i = numUsers; i < totalNodes; i++)
+			Q.add(i);
+		
+		//Start the distance list off at infinity except source which is 0
+		for (int i = 0; i < totalNodes; i++)		
+			distance[i] = INFINITY;
+		distance[source] = 0;
+		
+		//Cycle through all viable nodes
+		while(!Q.isEmpty()){
+			//Picks the closest out of the remaining nodes and removes it
+			current = findSmallest(distance, Q);
+			Q.remove((Integer)current);
+			
+			//If destination is neighbor deals with it
+			testDist = distance[current] + inContactMatrix[current][destination];
+			if (testDist < distance[destination]){                         
+				distance[destination] = testDist ;
+				precede[destination] = current;
+				success = true;
+				break;
+			}
+			
+			//Deals with all relay neighbors
+			for (int i = numUsers; i < totalNodes; i++){
+				testDist = distance[current] + inContactMatrix[current][i];
+				if (testDist < distance[i]){                         
+					distance[i] = testDist;
+					precede[i] = current; 
+				}
+			}			
+		}
+		
+		if (success){
+			while(precede[answer] != source){
+				answer = precede[answer];
+			}
+			
+			return answer;
+		}else{
+			return -1;
+		}
+	}
+	
+	private int findSmallest(float[] list, ArrayList<Integer> Q){
+		int x = Q.get(0);
+		for (int i : Q){
+			if (list[i] < list[x])
+				x = i;
+		}
+		
+		return x;
 	}
 }

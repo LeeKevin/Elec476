@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 
 public class DijkstrasAlg {
 
-	private static final int INFINITY = Integer.MAX_VALUE;
+	private static final int INFINITY = Integer.MAX_VALUE/2;
 	
 	private int source;
 	private int destination;
@@ -85,8 +85,8 @@ public class DijkstrasAlg {
 		path[finall] = destination;
 		finall++;
 		while (precede[i] != source) {
-			i = precede[i];
-			path[finall] = i;
+			int x = precede[i];
+			path[finall] = x;
 			finall++;
 		}
 		path[finall] = source;
@@ -159,8 +159,21 @@ public class DijkstrasAlg {
 		int[] path = getShortestPath();
 //		displayResult(path);
 
-		return path;
+		return reverse(path);
 	}
+	
+	public static int[] reverse(int[] a)
+    {
+    	int l = a.length;
+    	for (int j = 0; j < l / 2; j++)
+    	{
+        	int temp = a[j];
+        	a[j] = a[l - j - 1];
+        	a[l - j - 1] = temp;
+    	}
+   	 
+    	return a;
+    }
 
 }
 
