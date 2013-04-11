@@ -33,7 +33,7 @@ public class RandomNumGen {
 	}
 	
 	public int nextInt(int low, int high) {
-		return (int) Math.round(nextDouble((double) (low) + 0.499, (double) (high) + 0.499 ));
+		return (int) Math.round(nextDouble((double) (low) - 0.499, (double) (high) + 0.499 ));
 	}
 	
 	public double nextExp(double rate){
