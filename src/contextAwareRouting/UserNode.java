@@ -13,12 +13,11 @@ public class UserNode extends Node{
 	@Override
 	protected void serviceNextRequest() {
 		//Pull next request from queue
-		reqInService = removeRequest();
+		reqInService = queue.remove();
 		reqInService.setInQueue(false);
 		
 		//start/end condition
-		if (reqInService.getSourceNodeID() == this.getNodeID()) {
-			//If request is leaving
+		if (reqInService.getSourceNodeID() == nodeID) {
 			serviceTime = 0;
 			//If request has returned
 			if (reqInService.getStatus().equals(Request.Status.INCOMING)) {
@@ -26,6 +25,9 @@ public class UserNode extends Node{
 				reqInService.calculateTimeInSystem(Mainline.time);
 				reqInService.setStatus(Status.ARRIVED);
 				setReqInService(null);
+				Mainline.numdone++;
+				System.out.println((double)Mainline.numdone/Mainline.reqCount);
+				//else outgoing so ask server for next node
 			} else {
 				sendToServer();
 			}
@@ -43,6 +45,8 @@ public class UserNode extends Node{
 			reqInService.calculateTimeInSystem(Mainline.time);
 			reqInService.setStatus(Status.DROPPED);
 			setReqInService(null);
+			Mainline.fuckups++;
+			Mainline.numdone++;
 		}
 	}
 

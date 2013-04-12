@@ -18,7 +18,7 @@ public class CentralServer {
 		nodeList.addAll(userList);
 		nodeList.addAll(relayList);
 
-		numUsers = userList.size(); // These may be used for positioning in matrix, up for deletion
+		numUsers = userList.size();
 		numRelays = relayList.size(); 
 		totalNodes = numUsers+numRelays;
 
@@ -53,9 +53,8 @@ public class CentralServer {
 		//update the system matrix
 		updateInContactMatrix();
 		//cycle through every node that asked for a next path and handle it
-		for(int i = 0; i < queue.size(); i++){
-			Node node = retrieveNode(removeNodeRequest());
-			handleNode(node);
+		while(!queue.isEmpty()){
+			handleNode(nodeList.get(queue.remove()));
 		}
 	}
 
@@ -71,10 +70,6 @@ public class CentralServer {
 
 	public void addNodeRequest(int nodeId) {
 		queue.add(nodeId);
-	}
-
-	private int removeNodeRequest() {
-		return queue.remove();
 	}
 
 	public Node retrieveNode(int NodeID){
@@ -110,6 +105,10 @@ public class CentralServer {
 			//Picks the closest out of the remaining nodes and removes it
 			current = findSmallest(distance, Q);
 			Q.remove((Integer)current);
+			
+			if (distance[current] == INFINITY){
+				break;
+			}
 			
 			//If destination is neighbor deals with it
 			testDist = distance[current] + inContactMatrix[current][destination];

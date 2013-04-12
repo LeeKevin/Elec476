@@ -7,11 +7,11 @@ import contextAwareRouting.Request.Status;
 
 public abstract class Node {
 	//Node attributes
-	private int nodeID;
+	protected int nodeID;
 	private double xpos;
 	private double ypos;
-	private ArrayList<Integer> appList;
-	private LinkedList<Request> queue;
+	protected ArrayList<Integer> appList;
+	protected LinkedList<Request> queue;
 	
 	//Current request variables
 	protected int serviceTime = -1;
@@ -76,6 +76,8 @@ public abstract class Node {
 		}else{
 			reqInService.calculateTimeInSystem(Mainline.time);
 			reqInService.setStatus(Status.DROPPED);
+			Mainline.dropped ++;
+			Mainline.numdone++;
 		}
 	}
 

@@ -18,7 +18,7 @@ public class RandomNumGen {
 	
 		do {
 			last = last + nextExp(arrivalRate);
-			list.add((int) (last*(double)100));
+			list.add((int) (last*(double)1000));
 		}
 		while (last < maxTime);
 

@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -14,26 +15,29 @@ public class Mainline {
 
 	//System parameters
 	public static final int T = 40;
-	public static final int R = 200;
-	public static final int numUsers = 20;
-	public static final int numRelays = 200;
-	public static final int numApps = 1; // Must be greater than 0
+	public static final int R = 50;
+	public static final int numUsers = 10;
+	public static final int numRelays = 100;
+	public static final int numApps = 5; // Must be greater than 0
 	public static final double requestrate = 100;
-	public static final int maxtime = 1; //in seconds
+	public static final int maxtime = 5; //in seconds
 	public static final String [][] appPref = new String[0][0];
 	
 	//System attributes
-	private static int reqCount = 0;
+	public static int reqCount = 0;
 	public static int time = 0;
 	public static final RandomNumGen generator = new RandomNumGen();
 	public static String FileName = "statistics.csv";
 	private static ArrayList<Request> requestList = new ArrayList<Request>();
+	public static int fuckups= 0;
+	public static int dropped= 0;
+	public static int numdone = 0;
 	
 	//The server placed here so that it is visible to all other classes that need it
 	public static CentralServer server;
 	
 	public static void main(String[] args) {
-		//to remove: hard coded end to sim
+		//End condition
 		boolean end = false;
 
 		//Create random arrival times
@@ -46,12 +50,6 @@ public class Mainline {
 			System.out.print(xtime + ", ");
 		}
 		System.out.println();
-		
-		//statistical values
-		double inQueueTime = 0;
-		double inNetworkTime = 0;
-		
-		//needed to end the simulation
 
 		//main simulation time loop
 		do {
@@ -64,12 +62,12 @@ public class Mainline {
 						break;
 				}
 
+			//Tick the server
+			server.handleNodeRequests();
+			
 			//Tick all the nodes
 			for (int i=0; i< (numUsers+numRelays); i++)
 				server.retrieveNode(i).run();
-
-			//Tick the server
-			server.handleNodeRequests();
 
 			//Update request statistics
 			for (Request request: requestList) {
@@ -77,8 +75,45 @@ public class Mainline {
 					request.incrementTimeInQueue();
 			}
 
+			//If no more requests to generate and all of them have either arrived or dropped, end sim
+			if (arrivalTimes.isEmpty()){
+				end = true;
+				for (Request r : requestList) {
+					if (r.getStatus().equals(Request.Status.OUTGOING) || r.getStatus().equals(Request.Status.INCOMING)) {
+						end = false;
+						break;
+					}
+				}
+			}
+			
+			for(int i = 0; i < numUsers; i++){
+				double tmpX = 0;
+				double tmpY = 0;
+				
+				double tmpXnew = 0;
+				double tmpYnew = 0;
+				
+				double tmpCurrentX = server.retrieveNode(i).getXpos();
+				double tmpCurrentY = server.retrieveNode(i).getYpos();
+				
+				do{
+					tmpX = generator.nextDouble( (double) (-1)*T, (double) T );
+					tmpY = generator.nextDouble( (double) (-1)*T, (double) T );
+				
+					tmpXnew = tmpCurrentX + tmpX;
+					tmpYnew = tmpCurrentY + tmpY;
+					
+				}while( ( ((tmpX*tmpX) + (tmpY*tmpY)) > (double) (T*T)) || ( ((tmpXnew*tmpXnew) + (tmpYnew*tmpYnew))  > (double) (R*R)) );
+				
+				server.retrieveNode(i).setXpos( tmpXnew );
+				server.retrieveNode(i).setYpos( tmpYnew );	
+			}
+
+			//Increment time
+			time++;	
+			
 			//to remove: Prints the position of all requests + node 0 fuckups
-			System.out.println("Statistics for time: " + (double) time/1000 );
+			/*System.out.println("Statistics for time: " + (double) time/1000 );
 			
 			Node fuckup = server.retrieveNode(0);
 			String cur;
@@ -97,41 +132,26 @@ public class Mainline {
 			for(Request x : requestList){
 				System.out.print("Req:" + x.getRequestID() + " is " + x.getStatus());
 				System.out.println(" at node:"+ x.getCurrentNodeID());
-			}
-			
-
-			//Graphics generation goes here
-
-			//If no more requests to generate and all of them have either arrived or dropped, end sim
-			if (arrivalTimes.isEmpty()){
-				end = true;
-				for (Request r : requestList) {
-					if (r.getStatus().equals(Request.Status.OUTGOING) || r.getStatus().equals(Request.Status.INCOMING)) {
-						end = false;
-						break;
-					}
-				}
-			}
-			//to remove: hard coded simulation end condition
-			/*if (time > (10 * 1000)){
-				end = true;
 			}*/
 			
-			time++;	
-			
 		}while (!end);
+		
+		//statistical values
+		BigInteger inQueueTime = BigInteger.ZERO;
+		BigInteger inNetworkTime = BigInteger.ZERO;
 
 		//Final data output
 		for(int i = 0; i < requestList.size(); i++){
-			inNetworkTime = inNetworkTime + requestList.get(i).getInSystemTime();
-			inQueueTime = inQueueTime + requestList.get(i).getInQueueTime();
+			inNetworkTime = inNetworkTime.add(BigInteger.valueOf(requestList.get(i).getInSystemTime()));
+			inQueueTime = inQueueTime.add(BigInteger.valueOf(requestList.get(i).getInQueueTime()));
 		}
 
 		System.out.println("Total in queue time: " + inQueueTime);
 		System.out.println("Total in system time: " + inNetworkTime);
 		System.out.println("Total requests: " + reqCount);
 		System.out.println("Total Clock Cycles: " + time);
-
+		System.out.println("Total Dropped Request: " + dropped);
+		System.out.println("fucked up: " + fuckups);
 	}
 
 	private static ArrayList<UserNode> createUserNodes(int numUsers, int numApps){
@@ -177,8 +197,16 @@ public class Mainline {
 				y = generator.nextDouble(-R, R);
 			} while (Math.pow(x/R, 2) + Math.pow(y/R, 2) > 1);
 
+			//generates new array for each node
+			ArrayList<Integer> appList = new ArrayList<Integer>();
+
+			//fills it randomly
+			for (int j = 0; j<numApps; j++){
+				appList.add(generator.nextInt(1, numApps));
+			}
+			
 			//create new relay node and add to the master list
-			relayList.add(new RelayNode(numUsers + i, x, y));
+			relayList.add(new RelayNode(numUsers + i, x, y, appList));
 		}
 
 		return relayList;

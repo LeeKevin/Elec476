@@ -14,12 +14,10 @@ public class RelayNode extends Node{
 
 	@Override
 	protected void serviceNextRequest() {
-		if (getQueueSize() != 0) {
-			//Pull next request from queue, set its status and calc its service time
-			reqInService = removeRequest();
-			reqInService.setInQueue(false);
-			calculateServiceTime(reqInService);
-			sendToServer();
-		}		
+		//Pull next request from queue, set its status and calc its service time
+		reqInService = queue.remove();
+		reqInService.setInQueue(false);
+		calculateServiceTime(reqInService);
+		sendToServer();		
 	}
 }
