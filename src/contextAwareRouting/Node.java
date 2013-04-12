@@ -29,21 +29,6 @@ public abstract class Node {
 		this(nodeID,xpos,ypos);
 		this.appList = appList;
 	}
-
-	/*to remove: old run command
-	public void run() {
-		if (!processingRequest()) {
-			if (getReqInService() != null) {
-				Request req = getReqInService();
-				handleRequestAfterProcessing(req);
-			} else {
-				serviceNextRequest();
-				if (getServiceTime() == 0 && getReqInService() != null) {
-					sendToServer();
-				}
-			}
-		}
-	}*/
 	
 	public void run() {
 		//if serving count the time down
@@ -70,14 +55,16 @@ public abstract class Node {
 	}
 
 	protected void deployRequest() {
+		//If valid next node send it along
 		if (nextNodeID >= 0){
 			reqInService.setCurrentNodeID(nextNodeID);
 			Mainline.server.retrieveNode(nextNodeID).addRequest(reqInService);
+		//else drop it
 		}else{
-			reqInService.calculateTimeInSystem(Mainline.time);
+			reqInService.calculateTimeInSystem(fivetrial.mainline.time);
 			reqInService.setStatus(Status.DROPPED);
-			Mainline.dropped ++;
-			Mainline.numdone++;
+			fivetrial.mainline.dropped ++;
+			fivetrial.mainline.numdone++;
 		}
 	}
 
@@ -85,8 +72,35 @@ public abstract class Node {
 		Mainline.server.addNodeRequest(nodeID);
 	}
 
+	//Calculates and sets the amount of time node waits to simulate servicing
 	protected void calculateServiceTime(Request request) {
 		RandomNumGen generator = new RandomNumGen();
+		double rate;
+		
+		//If apps are implemented
+		if (appList != null){
+			//Gets the request application
+			int reqApp = request.getApp();
+			int minDist = Mainline.numApps;
+			
+			//cycles through node applications to check for best fit distance is minimum separation around a circle of diameter numapps
+			for (Integer app : appList) {
+				int dist = Math.min(Math.abs(reqApp - app), Math.min(reqApp, app) + Mainline.numApps - Math.max(reqApp, app));
+				if (dist < minDist)
+					minDist = dist;
+			}
+			//rate follows exponential decay with distance
+			rate = (minDist == 0) ? 2.0 : 1/(0.5 * Math.log((double) minDist) + 1.0);
+		}else{
+			rate = 2;
+		}
+		
+		//exponentialy distributed random time based on calculated rate
+		setServiceTime( (int) (generator.nextExp(rate)*10)); // service time in centiseconds
+	}
+	
+	//For context aware calculations returns the rate that would otherwise be used to calculate service time (see above)
+	public double calculateServiceRate(Request request) {
 		double rate;
 		
 		if (appList != null){
@@ -101,7 +115,7 @@ public abstract class Node {
 		}else{
 			rate = 2;
 		}
-		setServiceTime( (int) (generator.nextExp(rate) * 100)); // service time in milliseconds
+		return rate;
 	}
 
 	//NODE ID

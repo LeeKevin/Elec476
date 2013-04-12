@@ -31,7 +31,8 @@ public class Request {
 		
 		setStatus(Status.OUTGOING);
 		
-		Data.put(Statistics.START_TIME, Mainline.time);
+		//all the request does is contain its parameters and statistics
+		Data.put(Statistics.START_TIME, fivetrial.mainline.time);
 		Data.put(Statistics.TIME_IN_QUEUE, 0);
 		Data.put(Statistics.TIME_IN_SYSTEM, 0);
 

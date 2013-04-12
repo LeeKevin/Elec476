@@ -22,11 +22,11 @@ public class UserNode extends Node{
 			//If request has returned
 			if (reqInService.getStatus().equals(Request.Status.INCOMING)) {
 				// Retire request, if incoming
-				reqInService.calculateTimeInSystem(Mainline.time);
+				reqInService.calculateTimeInSystem(fivetrial.mainline.time);
 				reqInService.setStatus(Status.ARRIVED);
 				setReqInService(null);
-				Mainline.numdone++;
-				System.out.println((double)Mainline.numdone/Mainline.reqCount);
+				fivetrial.mainline.numdone++;
+				System.out.print("\r"+(double)fivetrial.mainline.numdone/fivetrial.mainline.reqCount);
 				//else outgoing so ask server for next node
 			} else {
 				sendToServer();
@@ -40,13 +40,14 @@ public class UserNode extends Node{
 			sendToServer();
 		}
 		
+		//else something fucked up (now fixed) fucked up should output to zero if no errors occurred
 		else {
 			serviceTime = 0;
-			reqInService.calculateTimeInSystem(Mainline.time);
+			reqInService.calculateTimeInSystem(fivetrial.mainline.time);
 			reqInService.setStatus(Status.DROPPED);
 			setReqInService(null);
-			Mainline.fuckups++;
-			Mainline.numdone++;
+			fivetrial.mainline.fuckups++;
+			fivetrial.mainline.numdone++;
 		}
 	}
 

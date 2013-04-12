@@ -14,29 +14,39 @@ import java.util.LinkedList;
 public class Mainline {
 
 	//System parameters
-	public static final int T = 40;
+	public static final int T = 50;
 	public static final int R = 50;
 	public static final int numUsers = 10;
-	public static final int numRelays = 100;
-	public static final int numApps = 5; // Must be greater than 0
-	public static final double requestrate = 100;
+	public static final int numRelays = 75;
+	public static final int numApps = 100; // Must be greater than 0
+	public static final double requestrate = 250;
 	public static final int maxtime = 5; //in seconds
-	public static final String [][] appPref = new String[0][0];
+	public static final boolean aware = false;
 	
 	//System attributes
-	public static int reqCount = 0;
-	public static int time = 0;
-	public static final RandomNumGen generator = new RandomNumGen();
-	public static String FileName = "statistics.csv";
-	private static ArrayList<Request> requestList = new ArrayList<Request>();
-	public static int fuckups= 0;
-	public static int dropped= 0;
-	public static int numdone = 0;
+	public int reqCount = 0;
+	public int time = 0;
+	public final RandomNumGen generator = new RandomNumGen();
+	public String FileName = "statistics.txt";
+	private ArrayList<Request> requestList = new ArrayList<Request>();
+	public int fuckups= 0;
+	public int dropped= 0;
+	public int numdone = 0;
 	
 	//The server placed here so that it is visible to all other classes that need it
 	public static CentralServer server;
 	
-	public static void main(String[] args) {
+	public void Mainine(){
+		reqCount = 0;
+		time = 0;
+		RandomNumGen generator = new RandomNumGen();
+		ArrayList<Request> requestList = new ArrayList<Request>();
+		fuckups= 0;
+		dropped= 0;
+		numdone = 0;
+	}
+	
+	public void runmain() {
 		//End condition
 		boolean end = false;
 
@@ -61,7 +71,6 @@ public class Mainline {
 					if (arrivalTimes.isEmpty())
 						break;
 				}
-
 			//Tick the server
 			server.handleNodeRequests();
 			
@@ -86,16 +95,19 @@ public class Mainline {
 				}
 			}
 			
+			//Code for moving users around
 			for(int i = 0; i < numUsers; i++){
+				//displacement
 				double tmpX = 0;
 				double tmpY = 0;
-				
+				//new position
 				double tmpXnew = 0;
 				double tmpYnew = 0;
-				
+				//current position
 				double tmpCurrentX = server.retrieveNode(i).getXpos();
 				double tmpCurrentY = server.retrieveNode(i).getYpos();
 				
+				//Make sure that the random number generator creates a valid jump
 				do{
 					tmpX = generator.nextDouble( (double) (-1)*T, (double) T );
 					tmpY = generator.nextDouble( (double) (-1)*T, (double) T );
@@ -105,34 +117,13 @@ public class Mainline {
 					
 				}while( ( ((tmpX*tmpX) + (tmpY*tmpY)) > (double) (T*T)) || ( ((tmpXnew*tmpXnew) + (tmpYnew*tmpYnew))  > (double) (R*R)) );
 				
+				//Set new position
 				server.retrieveNode(i).setXpos( tmpXnew );
 				server.retrieveNode(i).setYpos( tmpYnew );	
 			}
 
 			//Increment time
 			time++;	
-			
-			//to remove: Prints the position of all requests + node 0 fuckups
-			/*System.out.println("Statistics for time: " + (double) time/1000 );
-			
-			Node fuckup = server.retrieveNode(0);
-			String cur;
-			try{
-				cur = Integer.toString(fuckup.getReqInService().getRequestID());
-			}catch (Exception e){
-				cur = "null";
-			}
-			
-			System.out.print("Node 0 is servicing: " + cur + " and has ");
-			for (Request x : fuckup.getQueue()){
-				System.out.print(x.getRequestID() + ", ");
-			}
-			System.out.println("in the queue");
-			
-			for(Request x : requestList){
-				System.out.print("Req:" + x.getRequestID() + " is " + x.getStatus());
-				System.out.println(" at node:"+ x.getCurrentNodeID());
-			}*/
 			
 		}while (!end);
 		
@@ -146,15 +137,26 @@ public class Mainline {
 			inQueueTime = inQueueTime.add(BigInteger.valueOf(requestList.get(i).getInQueueTime()));
 		}
 
+		System.out.println();
 		System.out.println("Total in queue time: " + inQueueTime);
 		System.out.println("Total in system time: " + inNetworkTime);
 		System.out.println("Total requests: " + reqCount);
 		System.out.println("Total Clock Cycles: " + time);
 		System.out.println("Total Dropped Request: " + dropped);
 		System.out.println("fucked up: " + fuckups);
+		
+		printStats("Total in queue time: " + inQueueTime + "\n" 
+					+ "Total in system time: " + inNetworkTime + "\n" 
+					+ "Total requests: " + reqCount + "\n" 
+					+ "Total Clock Cycles: " + time + "\n"
+					+ "Total Dropped Request: " + dropped + "\n"
+					+ "fucked up: " + fuckups + "\n"
+					+ "\n"
+					+ "\n"
+					+ "\n");
 	}
 
-	private static ArrayList<UserNode> createUserNodes(int numUsers, int numApps){
+	private ArrayList<UserNode> createUserNodes(int numUsers, int numApps){
 		//variables to work with
 		double x = 0, y = 0;		 
 		ArrayList<UserNode> userList = new ArrayList<UserNode>(numUsers);
@@ -183,7 +185,7 @@ public class Mainline {
 		return userList;
 	}	 
 
-	private static ArrayList<RelayNode> createRelayNodes( int numRelays ){
+	private ArrayList<RelayNode> createRelayNodes( int numRelays ){
 		//Variables to work with
 		double x = 0, y = 0;		 
 		ArrayList<RelayNode> relayList = new ArrayList<RelayNode>(numRelays);
@@ -212,7 +214,7 @@ public class Mainline {
 		return relayList;
 	}
 
-	public static void createRequest(){
+	public void createRequest(){
 		int sourceNodeID = generator.nextInt(0, numUsers -1);
 		int destinationNodeID;
 
@@ -228,11 +230,10 @@ public class Mainline {
 		server.retrieveNode(sourceNodeID).addRequest(request);
 	}
 
-	public static void printStats( int node, int time, int clock )
+	public void printStats(String data)
 	{	
 		try{
 			//Open file to right. 
-			String data = " This content will append to the end of the file";
 
 			File file = new File(FileName);
 
